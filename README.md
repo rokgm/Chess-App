@@ -25,6 +25,6 @@ This applies to all build configurations (Debug, Release, RelWithDebInfo).
 - Warnings are treated as errors.
 - Warning levels are increased (see CMakeLists.txt for compile flags).
 
-## TODO
+## TODO when Chess AI is Implemented
 - Implemented install.
 - Implement release binary on GitLab.
