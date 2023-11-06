@@ -11,6 +11,9 @@ Recommended:
 Set wsl2 `wsl --set-default-version 2`. Check version `wsl -l -v`.
 - To open project directory in VS Code in WSL environment use `open_vscode_in_wsl.bat`.
 
+## Contributing
+- Make a branch with name that summaries what will be implemented and than make a merge request
+version1.
 
 ## Clang Format
 - Use .`clang-format` to format code.
@@ -22,5 +25,6 @@ This applies to all build configurations (Debug, Release, RelWithDebInfo).
 - Warnings are treated as errors.
 - Warning levels are increased (see CMakeLists.txt for compile flags).
 
-## Install
-- Not implemented
+## TODO when Chess AI is Implemented
+- Implemented install.
+- Implement release binary on GitLab.
