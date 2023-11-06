@@ -13,7 +13,7 @@ Set wsl2 `wsl --set-default-version 2`. Check version `wsl -l -v`.
 
 ## Contributing
 - Make a branch with name that summaries what will be implemented and than make a merge request
-version1.
+to version1.
 
 ## Clang Format
 - Use .`clang-format` to format code.
