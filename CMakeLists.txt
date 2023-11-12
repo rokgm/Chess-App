@@ -10,6 +10,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Set warning level and treat warning as errors.
-add_compile_options(-Werror -Wall -Wextra -Wpedantic)
+add_compile_options(-Werror -Wall -Wextra -Wpedantic -Wconversion)
 
 add_subdirectory(src)
