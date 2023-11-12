@@ -16,13 +16,6 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release"
       }
-    },
-    {
-      "name": "RelWithDebInfo",
-      "inherits": "Debug",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
-      }
     }
   ]
 }
