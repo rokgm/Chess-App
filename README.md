@@ -3,7 +3,7 @@
 ## Requirements
 - CMake (minimum required VERSION 3.22) with Ninja generator
 - g++ (C++ 17)
-- TODO: add lib requirements (sfml)
+- sfml (sudo apt-get install libsfml-dev)
 
 ## Developing on Windows
 Recommended:
