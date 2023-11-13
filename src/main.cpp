@@ -1,5 +1,6 @@
 #include "spdlog/spdlog.h"
 #include "test.h"
+#include "test1.h"
 
 #include <SFML/Graphics.hpp>
 
@@ -10,24 +11,25 @@ int main()
 
     // Test library. Delete this.
     test();
+    test1();
 
-    sf::RenderWindow window(sf::VideoMode(200, 200), "SFML works!");
-    sf::CircleShape shape(100.f);
-    shape.setFillColor(sf::Color::Green);
+    // sf::RenderWindow window(sf::VideoMode(200, 200), "SFML works!");
+    // sf::CircleShape shape(100.f);
+    // shape.setFillColor(sf::Color::Green);
 
-    while (window.isOpen())
-    {
-        sf::Event event;
-        while (window.pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed)
-                window.close();
-        }
+    // while (window.isOpen())
+    // {
+    //     sf::Event event;
+    //     while (window.pollEvent(event))
+    //     {
+    //         if (event.type == sf::Event::Closed)
+    //             window.close();
+    //     }
 
-        window.clear();
-        window.draw(shape);
-        window.display();
-    }
+    //     window.clear();
+    //     window.draw(shape);
+    //     window.display();
+    // }
 
     return 0;
 }

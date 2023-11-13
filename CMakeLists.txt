@@ -14,3 +14,9 @@ add_compile_options(-Werror -Wall -Wextra -Wpedantic -Wconversion)
 
 add_subdirectory(src)
 add_subdirectory(vendor)
+
+if(NOT TARGET spdlog)
+    find_package(spdlog REQUIRED)       
+endif()
+
+find_package(SFML COMPONENTS graphics)
