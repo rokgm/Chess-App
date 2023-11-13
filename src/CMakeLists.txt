@@ -2,9 +2,9 @@ add_executable(${PROJECT_NAME} main.cpp)
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
+    test
     spdlog::spdlog
     sfml-graphics
-    test
 )
 
 add_compile_definitions(
