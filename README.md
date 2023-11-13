@@ -43,4 +43,4 @@ This applies to all build configurations (Debug, Release).
 - Implement release binary on GitLab.
 
 ## Literature
-Overview of minimax engine: https://www.youtube.com/watch?v=w4FFX_otR-4&list=LL&index=2&t=313s
+Overview of the minimax engine: https://www.youtube.com/watch?v=w4FFX_otR-4&list=LL&index=2&t=313s
