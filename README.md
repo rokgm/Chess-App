@@ -8,7 +8,7 @@
 
 ## Developing on Windows
 
-- sing **VS Code**, open VS Code with `scripts/msvc_env.bat` to setup the correct environment for MSVC or open Code through `Visual Studio Developer Command Prompt`.
+- Using **VS Code**, open VS Code with `scripts/msvc_env.bat` to setup the correct environment for MSVC or open Code through `Visual Studio Developer Command Prompt`.
 - Using **WSL2** to run g++.
 Set wsl2 `wsl --set-default-version 2`. Check version `wsl -l -v`.
 
