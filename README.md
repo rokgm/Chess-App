@@ -1,27 +1,15 @@
 # Chess AI
 
 ## Requirements
-- **CMake** (minimum required VERSION 3.22) with Ninja generator.
-- **g++** (C++ 17).
-- **SFML** is automatically installed with this CMake configuration (fetch content).
-SFML's Linux dependencies must be installed with command:
-```
-sudo apt update
-sudo apt install \
-    libxrandr-dev \
-    libxcursor-dev \
-    libudev-dev \
-    libfreetype-dev \
-    libopenal-dev \
-    libflac-dev \
-    libvorbis-dev \
-    libgl1-mesa-dev \
-    libegl1-mesa-dev
-```
+- **CMake** (minimum required VERSION 3.22) with **Ninja** generator.
+- **g++** (support for C++ 17) or **MSVC** (Microsoft Visual Studio 2022).
+- SFML, spdlog and SFML's Linux dependencies are automatically installed with this CMake configuration.
+
 
 ## Developing on Windows
-Recommended:
-- **WSL2** is used by us to develop this application, so we would recommend it.
+
+- Using **VS Code**, open VS Code with `scripts/msvc_env.bat` to setup the correct environment or open Code through `Visual Studio Developer Command Prompt`.
+- Using **WSL2** to run g++.
 Set wsl2 `wsl --set-default-version 2`. Check version `wsl -l -v`.
 
 ## Contributing
