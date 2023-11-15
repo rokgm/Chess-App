@@ -10,7 +10,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Set warning level and treat warning as errors.
-#add_compile_options(-Werror -Wall -Wextra -Wpedantic -Wconversion)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    add_compile_options(-Werror -Wall -Wextra -Wpedantic -Wconversion)
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    add_compile_options(/permissive /W4 /WX)
+else()
+    message( FATAL_ERROR "Compiler not supported.")
+endif()
 
 add_subdirectory(src)
 
@@ -22,10 +28,12 @@ if(UNIX AND NOT APPLE)
 endif()
 
 # Project Dependencies
-if(WIN32)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
-else()
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     option(BUILD_SHARED_LIBS "Build shared libraries" ON)
+else ()
+    message( FATAL_ERROR "Compiler not supported.")
 endif()
 
 include(FetchContent)
