@@ -15,8 +15,7 @@ Set wsl2 `wsl --set-default-version 2`. Check version `wsl -l -v`.
 ## Contributing
 - Make a branch with name that summaries what will be implemented and then make a merge request
 to version1.
-
-## Clang Format
+- Use camel case.
 - Use **`.clang-format`** to format code.
 - Set auto format on.
 - `clang-format` minimum required version `14.0.0`.
