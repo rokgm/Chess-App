@@ -15,26 +15,20 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     add_compile_options(/permissive /W4 /WX)
 else()
-    message( FATAL_ERROR "Compiler not supported.")
+    message(FATAL_ERROR "Compiler not supported for this project.")
 endif()
 
 add_subdirectory(src)
 
-# Install SFML Linux Dependencies
+# Install SFML's Linux Dependencies
 if(UNIX AND NOT APPLE)
     execute_process (
     COMMAND
     bash ${CMAKE_CURRENT_SOURCE_DIR}/scripts/install_SFML_linux_dependencies.sh)
 endif()
 
-# Project Dependencies
-if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
-elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    option(BUILD_SHARED_LIBS "Build shared libraries" ON)
-else ()
-    message( FATAL_ERROR "Compiler not supported.")
-endif()
+# CHESS-AI Project Dependencies
+option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
 include(FetchContent)
 FetchContent_Declare(SFML
@@ -64,7 +58,7 @@ add_compile_definitions(
     $<$<CONFIG:Release>:SPDLOG_ACTIVE_LEVEL=2>
 )
 
-# SFML need this
+# SFML needs this
 if(WIN32)
     add_custom_command(
         TARGET ${PROJECT_NAME}
