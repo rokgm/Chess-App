@@ -22,6 +22,12 @@ if(UNIX AND NOT APPLE)
 endif()
 
 # Project Dependencies
+if(WIN32)
+    option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
+else()
+    option(BUILD_SHARED_LIBS "Build shared libraries" ON)
+endif()
+
 include(FetchContent)
 FetchContent_Declare(SFML
     GIT_REPOSITORY https://github.com/SFML/SFML.git
@@ -36,15 +42,6 @@ FetchContent_MakeAvailable(SFML spdlog)
 # PROJECT CHESS-AI
 add_executable(${PROJECT_NAME} src/main.cpp)
 
-# SFML need this
-if(WIN32)
-    add_custom_command(
-        TARGET ${PROJECT_NAME}
-        COMMENT "Copy OpenAL DLL"
-        PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${SFML_SOURCE_DIR}/extlibs/bin/$<IF:$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>,x64,x86>/openal32.dll $<TARGET_FILE_DIR:${PROJECT_NAME}>
-        VERBATIM)
-endif()
-
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
     spdlog::spdlog
@@ -58,3 +55,12 @@ add_compile_definitions(
     $<$<CONFIG:Debug>:SPDLOG_ACTIVE_LEVEL=0>
     $<$<CONFIG:Release>:SPDLOG_ACTIVE_LEVEL=2>
 )
+
+# SFML need this
+if(WIN32)
+    add_custom_command(
+        TARGET ${PROJECT_NAME}
+        COMMENT "Copy OpenAL DLL"
+        PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${SFML_SOURCE_DIR}/extlibs/bin/$<IF:$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>,x64,x86>/openal32.dll $<TARGET_FILE_DIR:${PROJECT_NAME}>
+        VERBATIM)
+endif()
