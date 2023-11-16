@@ -33,6 +33,7 @@ void Game::runGame()
             }
         }
 
+        // Set background grey color.
         m_window.clear(sf::Color::Color(128, 128, 128, 255));
 
         // TODO: Change this so, sprite is class member.
