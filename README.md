@@ -2,15 +2,12 @@
 
 ## Requirements
 - **CMake** (minimum required VERSION 3.22) with **Ninja** generator.
-- **g++** (support for C++ 17) or **MSVC** (Microsoft Visual Studio 2022).
+- **MSVC** (Microsoft Visual Studio 2022) or g++ with C++ 17 (Developed mostly on Windows but should work on Linux (WSL2)).
 - SFML, spdlog and SFML's Linux dependencies are automatically installed with this CMake configuration.
 
 
 ## Developing on Windows
-
 - Using **VS Code**, open VS Code with `scripts/msvc_env.bat` to setup the correct environment for MSVC or open Code through `Visual Studio Developer Command Prompt`.
-- Using **WSL2** to run g++.
-Set wsl2 `wsl --set-default-version 2`. Check version `wsl -l -v`.
 
 ## Contributing
 - Make a branch with name that summaries what will be implemented and then make a merge request
