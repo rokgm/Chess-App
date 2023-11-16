@@ -11,10 +11,10 @@ class Board
 public:
     Board(float fieldSize);
 
-    const std::array<std::array<sf::RectangleShape, 8>, 8>& getBoard() const;
+    const std::array<sf::RectangleShape, 64>& getBoard() const;
 
 private:
-    std::array<std::array<sf::RectangleShape, 8>, 8> m_board;
+    std::array<sf::RectangleShape, 64> m_board;
 };
 
 } // namespace chessAi
