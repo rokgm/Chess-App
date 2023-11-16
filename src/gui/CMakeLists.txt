@@ -1,8 +1,9 @@
-add_library(gui Board.cpp)
+add_library(gui Board.cpp Game.cpp)
 
 target_link_libraries(gui
     PRIVATE
     sfml-graphics
+    spdlog
 )
 
 target_include_directories(gui

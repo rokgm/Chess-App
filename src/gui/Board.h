@@ -9,12 +9,22 @@ namespace chessAi
 class Board
 {
 public:
-    Board(float fieldSize);
+    /**
+     * Construct a new chess board.
+     */
+    Board(unsigned int boardSize);
 
-    const std::array<sf::RectangleShape, 64>& getBoard() const;
+    /**
+     * Get the board sprite.
+     * Sprite origin is set to the middle of the board.
+     */
+    sf::Sprite getBoardSprite() const;
+
+    void boardResize(unsigned int newSize);
 
 private:
-    std::array<sf::RectangleShape, 64> m_board;
+    unsigned int m_boardSize;
+    sf::RenderTexture m_boardTexture;
 };
 
 } // namespace chessAi

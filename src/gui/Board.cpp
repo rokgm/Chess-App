@@ -1,13 +1,16 @@
 #include "Board.h"
 
+#include "spdlog/spdlog.h"
+
 namespace chessAi
 {
 
-Board::Board(float fieldSize)
+namespace
 {
-    uint8_t fieldIndex = 0;
 
-    for (auto& field : m_board) {
+void generateBoardFields(sf::RenderTexture& board, float fieldSize)
+{
+    for (uint8_t fieldIndex = 0; fieldIndex < 64; ++fieldIndex) {
         uint8_t rowIndex = fieldIndex % 8;
         uint8_t columnIndex = fieldIndex / 8;
 
@@ -26,15 +29,35 @@ Board::Board(float fieldSize)
         default:
             break;
         }
-
-        field = newField;
-        ++fieldIndex;
+        board.draw(newField);
     }
 }
 
-const std::array<sf::RectangleShape, 64>& Board::getBoard() const
+} // namespace
+
+Board::Board(unsigned int boardSize) : m_boardSize(boardSize)
 {
-    return m_board;
+    if (!m_boardTexture.create(m_boardSize, m_boardSize)) {
+        SPDLOG_ERROR("Board texture could not be created.");
+    }
+    m_boardTexture.clear();
+    generateBoardFields(m_boardTexture, static_cast<float>(boardSize) / 8);
+    m_boardTexture.display();
+}
+
+sf::Sprite Board::getBoardSprite() const
+{
+    sf::Sprite board(m_boardTexture.getTexture());
+    board.setOrigin(static_cast<float>(m_boardSize) / 2, static_cast<float>(m_boardSize) / 2);
+    return board;
+}
+
+void Board::boardResize(unsigned int newSize)
+{
+    m_boardSize = newSize;
+    m_boardTexture.clear();
+    generateBoardFields(m_boardTexture, static_cast<float>(newSize) / 8);
+    m_boardTexture.display();
 }
 
 } // namespace chessAi
