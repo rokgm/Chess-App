@@ -36,7 +36,7 @@ void Game::runGame()
         // Set background grey color.
         m_window.clear(sf::Color::Color(128, 128, 128, 255));
 
-        // TODO: Change this so, sprite is class member.
+        // TODO: Change this so sprite is a class member, then handle resize with sprite resize().
         auto boardSprite = m_board.getBoardSprite();
         boardSprite.setPosition(0.5f * static_cast<sf::Vector2f>(m_windowSize));
 
