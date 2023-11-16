@@ -20,7 +20,7 @@ public:
      */
     sf::Sprite getBoardSprite() const;
 
-    void boardResize(unsigned int newSize);
+    void boardResize(unsigned int newBoardSize);
 
 private:
     unsigned int m_boardSize;

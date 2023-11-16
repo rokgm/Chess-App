@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Board.h"
+
 #include <SFML/Graphics.hpp>
 
 namespace chessAi
@@ -31,6 +33,7 @@ private:
 private:
     WindowSize m_windowSize;
     sf::RenderWindow m_window;
+    Board m_board;
 };
 
 } // namespace chessAi

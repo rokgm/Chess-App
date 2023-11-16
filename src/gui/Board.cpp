@@ -52,11 +52,14 @@ sf::Sprite Board::getBoardSprite() const
     return board;
 }
 
-void Board::boardResize(unsigned int newSize)
+void Board::boardResize(unsigned int newBoardSize)
 {
-    m_boardSize = newSize;
+    m_boardSize = newBoardSize;
+    if (!m_boardTexture.create(newBoardSize, newBoardSize)) {
+        SPDLOG_ERROR("Board texture could not be created.");
+    }
     m_boardTexture.clear();
-    generateBoardFields(m_boardTexture, static_cast<float>(newSize) / 8);
+    generateBoardFields(m_boardTexture, static_cast<float>(newBoardSize) / 8);
     m_boardTexture.display();
 }
 
