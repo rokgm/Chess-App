@@ -11,25 +11,23 @@ Game::Game(unsigned int windowWidth, unsigned int windowHeight)
     m_window.setVerticalSyncEnabled(true);
 }
 
-// void Game::handleWindowResize()
-// {
-// }
+void Game::handleWindowResize(const sf::Event& event)
+{
+    m_window.setView(sf::View(sf::FloatRect(0, 0, static_cast<float>(event.size.width),
+                                            static_cast<float>(event.size.height))));
+    m_windowSize.x = event.size.width;
+    m_windowSize.y = event.size.height;
+}
 
 void Game::runGame()
 {
-    // sf::RenderWindow window(sf::VideoMode(m_windowSize.x, m_windowSize.y), "Chess Game");
-    // window.setVerticalSyncEnabled(true);
-
     while (m_window.isOpen()) {
         sf::Event event;
         while (m_window.pollEvent(event)) {
             if (event.type == sf::Event::Closed)
                 m_window.close();
             if (event.type == sf::Event::Resized) {
-                m_window.setView(sf::View(sf::FloatRect(0, 0, static_cast<float>(event.size.width),
-                                                        static_cast<float>(event.size.height))));
-                m_windowSize.x = event.size.width;
-                m_windowSize.y = event.size.height;
+                handleWindowResize(event);
             }
         }
 

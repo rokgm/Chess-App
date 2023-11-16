@@ -26,7 +26,7 @@ public:
     void runGame();
 
 private:
-    // void handleWindowResize(const sf::Event& event);
+    void handleWindowResize(const sf::Event& event);
 
 private:
     WindowSize m_windowSize;
