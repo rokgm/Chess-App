@@ -1,8 +1,10 @@
 # Chess AI
 
 ## Requirements
-- **CMake** (minimum required VERSION 3.22) with **Ninja** generator.
-- **MSVC** (Microsoft Visual Studio 2022) or g++ with C++ 17 (Developed mostly on Windows but should work on Linux (WSL2)).
+* **CMake** (minimum required VERSION 3.22) with **Ninja** generator.
+* Compiler:
+    - **MSVC** (Microsoft Visual Studio 2022),
+    - **g++** with C++ 17  support. **WIP** (should work, but was not checked for most recent verison).
 - SFML, spdlog and SFML's Linux dependencies are automatically installed with this CMake configuration.
 
 
