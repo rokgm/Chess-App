@@ -28,6 +28,8 @@ public:
     void runGame();
 
 private:
+    void handleEvents();
+    void drawGameTextures();
     void handleWindowResize(const sf::Event& event);
 
 private:

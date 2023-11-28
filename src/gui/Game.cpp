@@ -21,27 +21,40 @@ void Game::handleWindowResize(const sf::Event& event)
     m_board.boardResize(m_windowSize.getSmallestAxis() * 4 / 5);
 }
 
+void Game::handleEvents()
+{
+    sf::Event event;
+    while (m_window.pollEvent(event)) {
+        switch (event.type) {
+        case sf::Event::Closed:
+            m_window.close();
+            break;
+        case sf::Event::Resized:
+            handleWindowResize(event);
+            break;
+        }
+    }
+}
+
+void Game::drawGameTextures()
+{
+    // Set background grey color.
+    m_window.clear(sf::Color::Color(128, 128, 128, 255));
+
+    // TODO: Change this so sprite is a class member, then handle resize with sprite
+    // resize().
+    auto boardSprite = m_board.getBoardSprite();
+    boardSprite.setPosition(0.5f * static_cast<sf::Vector2f>(m_windowSize));
+
+    m_window.draw(boardSprite);
+    m_window.display();
+}
+
 void Game::runGame()
 {
     while (m_window.isOpen()) {
-        sf::Event event;
-        while (m_window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed)
-                m_window.close();
-            if (event.type == sf::Event::Resized) {
-                handleWindowResize(event);
-            }
-        }
-
-        // Set background grey color.
-        m_window.clear(sf::Color::Color(128, 128, 128, 255));
-
-        // TODO: Change this so sprite is a class member, then handle resize with sprite resize().
-        auto boardSprite = m_board.getBoardSprite();
-        boardSprite.setPosition(0.5f * static_cast<sf::Vector2f>(m_windowSize));
-
-        m_window.draw(boardSprite);
-        m_window.display();
+        handleEvents();
+        drawGameTextures();
     }
 }
 
