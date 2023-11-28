@@ -35,7 +35,6 @@ private:
 private:
     WindowSize m_windowSize;
     sf::RenderWindow m_window;
-    // TODO: Change this so, sprite is class member.
     Board m_board;
 };
 

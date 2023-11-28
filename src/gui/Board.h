@@ -24,6 +24,7 @@ public:
 
 private:
     unsigned int m_boardSize;
+    sf::Sprite m_boardSprite;
     sf::RenderTexture m_boardTexture;
 };
 

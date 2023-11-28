@@ -42,25 +42,22 @@ Board::Board(unsigned int boardSize) : m_boardSize(boardSize)
     }
     m_boardTexture.clear();
     generateBoardFields(m_boardTexture, static_cast<float>(boardSize) / 8);
-    m_boardTexture.display();
+    m_boardSprite.setTexture(m_boardTexture.getTexture());
+    m_boardSprite.setOrigin(static_cast<float>(m_boardSize) / 2,
+                            static_cast<float>(m_boardSize) / 2);
 }
 
 sf::Sprite Board::getBoardSprite() const
 {
-    sf::Sprite board(m_boardTexture.getTexture());
-    board.setOrigin(static_cast<float>(m_boardSize) / 2, static_cast<float>(m_boardSize) / 2);
-    return board;
+    return m_boardSprite;
 }
 
 void Board::boardResize(unsigned int newBoardSize)
 {
+    m_boardSprite.setScale(static_cast<float>(newBoardSize) / m_boardSprite.getLocalBounds().width,
+                           static_cast<float>(newBoardSize) /
+                               m_boardSprite.getLocalBounds().height);
     m_boardSize = newBoardSize;
-    if (!m_boardTexture.create(newBoardSize, newBoardSize)) {
-        SPDLOG_ERROR("Board texture could not be created.");
-    }
-    m_boardTexture.clear();
-    generateBoardFields(m_boardTexture, static_cast<float>(newBoardSize) / 8);
-    m_boardTexture.display();
 }
 
 } // namespace chessAi
