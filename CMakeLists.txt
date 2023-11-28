@@ -67,3 +67,6 @@ if(WIN32)
         PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${SFML_SOURCE_DIR}/extlibs/bin/$<IF:$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>,x64,x86>/openal32.dll $<TARGET_FILE_DIR:${PROJECT_NAME}>
         VERBATIM)
 endif()
+
+# Copy chess pieces images to binary dir.
+file(COPY pieces_images DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
