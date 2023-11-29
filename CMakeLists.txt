@@ -42,7 +42,10 @@ FetchContent_Declare(spdlog
 FetchContent_MakeAvailable(SFML spdlog)
 
 # PROJECT CHESS-AI
-add_executable(${PROJECT_NAME} $<$<PLATFORM_ID:Windows>:WIN32> src/main.cpp)
+add_executable(${PROJECT_NAME} src/main.cpp)
+if(WIN32)
+    set_target_properties(${PROJECT_NAME} PROPERTIES WIN32_EXECUTABLE TRUE)
+endif()
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
