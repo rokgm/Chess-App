@@ -42,14 +42,13 @@ FetchContent_Declare(spdlog
 FetchContent_MakeAvailable(SFML spdlog)
 
 # PROJECT CHESS-AI
-add_executable(${PROJECT_NAME} WIN32 src/main.cpp)
-
+add_executable(${PROJECT_NAME} $<$<PLATFORM_ID:Windows>:WIN32> src/main.cpp)
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
     spdlog::spdlog
     sfml-graphics
-    sfml-main
+    $<$<PLATFORM_ID:Windows>:sfml-main>
     gui
 )
 
