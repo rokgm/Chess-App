@@ -1,7 +1,7 @@
 #!/bin/bash
 
 sudo apt-get update
-sudo apt-get install \
+yes Y | sudo apt-get install \
     libxrandr-dev \
     libxcursor-dev \
     libudev-dev \
@@ -11,6 +11,3 @@ sudo apt-get install \
     libvorbis-dev \
     libgl1-mesa-dev \
     libegl1-mesa-dev
-
-yes Y | apt-get autoremove
-sudo apt-get autoremove

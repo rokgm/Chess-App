@@ -32,6 +32,8 @@ void Game::handleEvents()
         case sf::Event::Resized:
             handleWindowResize(event);
             break;
+        default:
+            break;
         }
     }
 }
@@ -39,7 +41,7 @@ void Game::handleEvents()
 void Game::drawGameTextures()
 {
     // Set  grey background color.
-    m_window.clear(sf::Color::Color(128, 128, 128, 255));
+    m_window.clear(sf::Color(128, 128, 128, 255));
 
     auto boardSprite = m_board.getBoardSprite();
     boardSprite.setPosition(0.5f * static_cast<sf::Vector2f>(m_windowSize));

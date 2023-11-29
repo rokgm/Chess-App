@@ -20,11 +20,11 @@ void generateBoardFields(sf::RenderTexture& board, float fieldSize)
         switch ((rowIndex + columnIndex) % 2) {
         case 0:
             // Set light brown color.
-            newField.setFillColor(sf::Color::Color(254, 231, 193, 255));
+            newField.setFillColor(sf::Color(254, 231, 193, 255));
             break;
         case 1:
             // Set dark brown color.
-            newField.setFillColor(sf::Color::Color(150, 77, 34, 255));
+            newField.setFillColor(sf::Color(150, 77, 34, 255));
             break;
         default:
             break;
