@@ -1,11 +1,6 @@
-#include "Game.h"
+#include "gui/Game.h"
 
 #include "spdlog/spdlog.h"
-
-namespace chessAi
-{
-
-} // namespace chessAi
 
 int main()
 {
