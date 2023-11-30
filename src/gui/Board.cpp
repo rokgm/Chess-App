@@ -47,17 +47,22 @@ Board::Board(unsigned int boardSize) : m_boardSize(boardSize)
                             static_cast<float>(m_boardSize) / 2);
 }
 
-sf::Sprite Board::getBoardSprite() const
+const sf::Sprite& Board::getBoardSprite() const
 {
     return m_boardSprite;
 }
 
-void Board::boardResize(unsigned int newBoardSize)
+void Board::resize(unsigned int newBoardSize)
 {
     m_boardSprite.setScale(static_cast<float>(newBoardSize) / m_boardSprite.getLocalBounds().width,
                            static_cast<float>(newBoardSize) /
                                m_boardSprite.getLocalBounds().height);
     m_boardSize = newBoardSize;
+}
+
+void Board::setCenterPosition(const sf::Vector2u& windowSize)
+{
+    m_boardSprite.setPosition(0.5f * static_cast<sf::Vector2f>(windowSize));
 }
 
 } // namespace chessAi

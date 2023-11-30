@@ -10,6 +10,7 @@ Game::Game(unsigned int windowWidth, unsigned int windowHeight)
       m_board(Board(m_windowSize.getSmallestAxis() * 4 / 5))
 {
     m_window.setVerticalSyncEnabled(true);
+    m_board.setCenterPosition(m_windowSize);
 }
 
 void Game::handleWindowResize(const sf::Event& event)
@@ -18,7 +19,8 @@ void Game::handleWindowResize(const sf::Event& event)
                                             static_cast<float>(event.size.height))));
     m_windowSize.x = event.size.width;
     m_windowSize.y = event.size.height;
-    m_board.boardResize(m_windowSize.getSmallestAxis() * 4 / 5);
+    m_board.resize(m_windowSize.getSmallestAxis() * 4 / 5);
+    m_board.setCenterPosition(m_windowSize);
 }
 
 void Game::handleEvents()
@@ -43,8 +45,7 @@ void Game::drawGameTextures()
     // Set  grey background color.
     m_window.clear(sf::Color(128, 128, 128, 255));
 
-    auto boardSprite = m_board.getBoardSprite();
-    boardSprite.setPosition(0.5f * static_cast<sf::Vector2f>(m_windowSize));
+    const auto& boardSprite = m_board.getBoardSprite();
 
     m_window.draw(boardSprite);
     m_window.display();

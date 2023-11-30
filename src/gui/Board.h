@@ -5,8 +5,8 @@
 namespace chessAi
 {
 
-// TODO: Implement in separate file.
-struct Pieces
+// TODO: Implement in separate file. Abstract class
+class Piece
 {
     // sf::Texture blackBishop;
     //     sf::Texture texture;
@@ -29,12 +29,13 @@ public:
      * Get the board sprite.
      * Sprite origin is set to the middle of the board.
      */
-    sf::Sprite getBoardSprite() const;
+    const sf::Sprite& getBoardSprite() const;
 
-    void boardResize(unsigned int newBoardSize);
+    void resize(unsigned int newBoardSize);
+
+    void setCenterPosition(const sf::Vector2u& windowSize);
 
 private:
-    Pieces m_pieces;
     unsigned int m_boardSize;
     sf::Sprite m_boardSprite;
     sf::RenderTexture m_boardTexture;
