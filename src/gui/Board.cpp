@@ -42,6 +42,7 @@ Board::Board(unsigned int boardSize) : m_boardSize(boardSize)
     }
     m_boardTexture.clear();
     generateBoardFields(m_boardTexture, static_cast<float>(boardSize) / 8);
+    m_boardTexture.display();
     m_boardSprite.setTexture(m_boardTexture.getTexture());
     m_boardSprite.setOrigin(static_cast<float>(m_boardSize) / 2,
                             static_cast<float>(m_boardSize) / 2);

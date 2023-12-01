@@ -43,19 +43,26 @@ FetchContent_MakeAvailable(SFML spdlog)
 
 # PROJECT CHESS-AI
 add_executable(${PROJECT_NAME} src/main.cpp)
-if(WIN32)
-    set_target_properties(${PROJECT_NAME} PROPERTIES WIN32_EXECUTABLE TRUE)
-endif()
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
     spdlog::spdlog
     sfml-graphics
-    $<$<PLATFORM_ID:Windows>:sfml-main>
     gui
 )
+# Make it a Gui App in Release Mode
+if (WIN32 AND CMAKE_BUILD_TYPE STREQUAL "Release")
+    message("Setting application type to GUI for release build.")
+    set_target_properties(${PROJECT_NAME} PROPERTIES WIN32_EXECUTABLE TRUE)
+    target_link_libraries(${PROJECT_NAME}
+        PRIVATE
+        sfml-main
+    )
+endif()  
 
-add_compile_definitions(
+
+target_compile_definitions(${PROJECT_NAME}
+    PRIVATE
     $<$<CONFIG:Debug>:DEBUG>
     $<$<CONFIG:Release>:RELEASE>
 

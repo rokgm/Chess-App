@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "Board.h"
+#include "PieceTextures.h"
 
 namespace chessAi
 {
@@ -7,7 +8,8 @@ namespace chessAi
 Game::Game(unsigned int windowWidth, unsigned int windowHeight)
     : m_windowSize(windowWidth, windowHeight),
       m_window(sf::RenderWindow(sf::VideoMode(m_windowSize.x, m_windowSize.y), "Chess Game")),
-      m_board(Board(m_windowSize.getSmallestAxis() * 4 / 5))
+      m_board(Board(m_windowSize.getSmallestAxis() * 4 / 5)),
+      m_pieceTextures(PieceTextures::getPieceTextures())
 {
     m_window.setVerticalSyncEnabled(true);
     m_board.setCenterPosition(m_windowSize);
@@ -46,8 +48,20 @@ void Game::drawGameTextures()
     m_window.clear(sf::Color(128, 128, 128, 255));
 
     const auto& boardSprite = m_board.getBoardSprite();
-
     m_window.draw(boardSprite);
+
+    // TODO: Improve this test drawing and move to function that draws from board state.
+    float x = 100.f;
+    float y = 100.f;
+    for (const auto& [piece, texture] : m_pieceTextures) {
+        sf::Sprite sprite(texture);
+        sprite.setOrigin(sprite.getLocalBounds().width / 2, sprite.getLocalBounds().height / 2);
+        sprite.setPosition(x, y);
+        m_window.draw(sprite);
+        x += 50.f;
+        y += 50.f;
+    }
+
     m_window.display();
 }
 

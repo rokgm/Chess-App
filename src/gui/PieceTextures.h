@@ -9,13 +9,10 @@
 namespace chessAi
 {
 
-class PiecesSprites
+class PieceTextures
 {
 public:
-    PiecesSprites();
-
-private:
-    std::unordered_map<Pieces::Piece, sf::Sprite> m_sprites;
+    static std::unordered_map<Pieces::Piece, sf::Texture> getPieceTextures();
 };
 
 } // namespace chessAi

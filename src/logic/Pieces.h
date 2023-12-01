@@ -9,7 +9,7 @@ namespace chessAi
 
 struct Pieces
 {
-    enum Piece
+    enum class Piece
     {
         whitePawn,
         whiteBishop,
@@ -25,11 +25,7 @@ struct Pieces
         blackQueen
     };
 
-    inline const static std::array<Piece, 12> allPieces = {
-        whitePawn, whiteBishop, whiteKnight, whiteRook, whiteKing, whiteQueen,
-        blackPawn, blackBishop, blackKnight, blackRook, blackKing, blackQueen};
-
-    inline const static std::unordered_map<Piece, int> PieceValues = {
+    inline const static std::unordered_map<Piece, int> pieceValues = {
         {Piece::whitePawn, 1},    {Piece::whiteBishop, 3},
         {Piece::whiteKnight, 3},  {Piece::whiteRook, 5},
         {Piece::whiteQueen, 9},   {Piece::whiteKing, std::numeric_limits<int>::max()},
