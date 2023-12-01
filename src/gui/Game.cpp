@@ -8,32 +8,35 @@ namespace chessAi
 namespace
 {
 
-std::unordered_map<BoardState::Piece, sf::Texture> getPieceTextures()
+std::unordered_map<BoardPosition::Piece, sf::Texture> getPieceTextures()
 {
-    std::unordered_map<BoardState::Piece, std::string> pieceToFileName = {
-        {BoardState::Piece::blackBishop, "black-bishop.png"},
-        {BoardState::Piece::blackKing, "black-king.png"},
-        {BoardState::Piece::blackKnight, "black-knight.png"},
-        {BoardState::Piece::blackPawn, "black-pawn.png"},
-        {BoardState::Piece::blackQueen, "black-queen.png"},
-        {BoardState::Piece::blackRook, "black-rook.png"},
-        {BoardState::Piece::whiteBishop, "white-bishop.png"},
-        {BoardState::Piece::whiteKing, "white-king.png"},
-        {BoardState::Piece::whiteKnight, "white-knight.png"},
-        {BoardState::Piece::whitePawn, "white-pawn.png"},
-        {BoardState::Piece::whiteQueen, "white-queen.png"},
-        {BoardState::Piece::whiteRook, "white-rook.png"},
+    std::unordered_map<BoardPosition::Piece, std::string> pieceToFileName = {
+        {BoardPosition::Piece::blackBishop, "black-bishop.png"},
+        {BoardPosition::Piece::blackKing, "black-king.png"},
+        {BoardPosition::Piece::blackKnight, "black-knight.png"},
+        {BoardPosition::Piece::blackPawn, "black-pawn.png"},
+        {BoardPosition::Piece::blackQueen, "black-queen.png"},
+        {BoardPosition::Piece::blackRook, "black-rook.png"},
+        {BoardPosition::Piece::whiteBishop, "white-bishop.png"},
+        {BoardPosition::Piece::whiteKing, "white-king.png"},
+        {BoardPosition::Piece::whiteKnight, "white-knight.png"},
+        {BoardPosition::Piece::whitePawn, "white-pawn.png"},
+        {BoardPosition::Piece::whiteQueen, "white-queen.png"},
+        {BoardPosition::Piece::whiteRook, "white-rook.png"},
     };
 
-    std::unordered_map<BoardState::Piece, sf::Texture> textures;
+    std::unordered_map<BoardPosition::Piece, sf::Texture> textures;
 
     for (const auto& [piece, fileName] : pieceToFileName) {
-        auto& texture = textures[piece];
+        sf::Texture texture;
         if (!texture.loadFromFile("pieces_images/" + fileName)) {
             SPDLOG_ERROR("File {} couldn't be opened.", fileName);
         }
         texture.setSmooth(true);
         SPDLOG_TRACE("Texture loaded from file {}.", fileName);
+        if (!textures.insert({piece, std::move(texture)}).second) {
+            SPDLOG_ERROR("Texture {} couldn't be inserted to piece textures map.", fileName);
+        }
     }
 
     return textures;
@@ -44,7 +47,8 @@ std::unordered_map<BoardState::Piece, sf::Texture> getPieceTextures()
 Game::Game(unsigned int windowWidth, unsigned int windowHeight)
     : m_windowSize(windowWidth, windowHeight),
       m_window(sf::RenderWindow(sf::VideoMode(m_windowSize.x, m_windowSize.y), "Chess Game")),
-      m_board(Board(m_windowSize.getSmallestAxis() * 4 / 5)), m_pieceTextures(getPieceTextures())
+      m_board(Board(m_windowSize.getSmallestAxis() * 4 / 5)), m_pieceTextures(getPieceTextures()),
+      m_boardPosition(BoardPosition())
 {
     m_window.setVerticalSyncEnabled(true);
     m_board.setCenterPosition(m_windowSize);
@@ -77,26 +81,38 @@ void Game::handleEvents()
     }
 }
 
-void Game::drawGameTextures()
+void Game::drawPieceType(const std::vector<int>& positions, sf::Sprite& pieceSprite,
+                         const sf::FloatRect& boardGlobalBounds, const float& boardFieldSize)
+{
+    for (const auto& position : positions) {
+        pieceSprite.setPosition(boardGlobalBounds.left + boardFieldSize * (position % 8),
+                                boardGlobalBounds.top + boardFieldSize * (position / 8));
+        m_window.draw(pieceSprite);
+    }
+}
+
+void Game::drawPosition()
+{
+    auto boardGlobalBounds = m_board.getBoardSprite().getGlobalBounds();
+    auto boardFieldSize = boardGlobalBounds.width / 8;
+
+    for (const auto& [pieceType, bitPiecePositions] : m_boardPosition.getBoardPosition()) {
+        auto integerPositions = BoardPosition::findSetBits(bitPiecePositions);
+        sf::Sprite pieceSprite(m_pieceTextures[pieceType]);
+        pieceSprite.scale(boardFieldSize / pieceSprite.getLocalBounds().width,
+                          boardFieldSize / pieceSprite.getLocalBounds().height);
+        drawPieceType(integerPositions, pieceSprite, boardGlobalBounds, boardFieldSize);
+    }
+}
+
+void Game::displayGameSprites()
 {
     // Set  grey background color.
     m_window.clear(sf::Color(128, 128, 128, 255));
 
     const auto& boardSprite = m_board.getBoardSprite();
     m_window.draw(boardSprite);
-
-    // TODO: Improve this test drawing and move to function that draws from board state.
-    float x = 100.f;
-    float y = 100.f;
-    for (const auto& [piece, texture] : m_pieceTextures) {
-        sf::Sprite sprite(texture);
-        sprite.setOrigin(sprite.getLocalBounds().width / 2, sprite.getLocalBounds().height / 2);
-        sprite.setPosition(x, y);
-        m_window.draw(sprite);
-        x += 50.f;
-        y += 50.f;
-    }
-
+    drawPosition();
     m_window.display();
 }
 
@@ -104,7 +120,7 @@ void Game::runGame()
 {
     while (m_window.isOpen()) {
         handleEvents();
-        drawGameTextures();
+        displayGameSprites();
     }
 }
 

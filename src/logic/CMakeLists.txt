@@ -1,4 +1,9 @@
-add_library(logic BoardState.cpp BoardState.h)
+add_library(logic BoardPosition.cpp BoardPosition.h)
+
+target_link_libraries(logic
+    PRIVATE
+    spdlog
+)
 
 target_include_directories(logic
     INTERFACE
