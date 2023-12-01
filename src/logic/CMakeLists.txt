@@ -1,4 +1,4 @@
-add_library(logic Pieces.cpp Pieces.h)
+add_library(logic BoardState.cpp BoardState.h)
 
 target_include_directories(logic
     INTERFACE

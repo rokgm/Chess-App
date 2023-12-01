@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Board.h"
-#include "logic/Pieces.h"
+#include "logic/BoardState.h"
 
 #include <SFML/Graphics.hpp>
 
@@ -39,7 +39,7 @@ private:
     WindowSize m_windowSize;
     sf::RenderWindow m_window;
     Board m_board;
-    std::unordered_map<Pieces::Piece, sf::Texture> m_pieceTextures;
+    std::unordered_map<BoardState::Piece, sf::Texture> m_pieceTextures;
 };
 
 } // namespace chessAi

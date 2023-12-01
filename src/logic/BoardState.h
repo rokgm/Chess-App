@@ -7,8 +7,9 @@
 namespace chessAi
 {
 
-struct Pieces
+class BoardState
 {
+public:
     enum class Piece
     {
         whitePawn,

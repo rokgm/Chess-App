@@ -1,15 +1,50 @@
 #include "Game.h"
-#include "Board.h"
-#include "PieceTextures.h"
+
+#include "spdlog/spdlog.h"
 
 namespace chessAi
 {
 
+namespace
+{
+
+std::unordered_map<BoardState::Piece, sf::Texture> getPieceTextures()
+{
+    std::unordered_map<BoardState::Piece, std::string> pieceToFileName = {
+        {BoardState::Piece::blackBishop, "black-bishop.png"},
+        {BoardState::Piece::blackKing, "black-king.png"},
+        {BoardState::Piece::blackKnight, "black-knight.png"},
+        {BoardState::Piece::blackPawn, "black-pawn.png"},
+        {BoardState::Piece::blackQueen, "black-queen.png"},
+        {BoardState::Piece::blackRook, "black-rook.png"},
+        {BoardState::Piece::whiteBishop, "white-bishop.png"},
+        {BoardState::Piece::whiteKing, "white-king.png"},
+        {BoardState::Piece::whiteKnight, "white-knight.png"},
+        {BoardState::Piece::whitePawn, "white-pawn.png"},
+        {BoardState::Piece::whiteQueen, "white-queen.png"},
+        {BoardState::Piece::whiteRook, "white-rook.png"},
+    };
+
+    std::unordered_map<BoardState::Piece, sf::Texture> textures;
+
+    for (const auto& [piece, fileName] : pieceToFileName) {
+        auto& texture = textures[piece];
+        if (!texture.loadFromFile("pieces_images/" + fileName)) {
+            SPDLOG_ERROR("File {} couldn't be opened.", fileName);
+        }
+        texture.setSmooth(true);
+        SPDLOG_TRACE("Texture loaded from file {}.", fileName);
+    }
+
+    return textures;
+}
+
+} // namespace
+
 Game::Game(unsigned int windowWidth, unsigned int windowHeight)
     : m_windowSize(windowWidth, windowHeight),
       m_window(sf::RenderWindow(sf::VideoMode(m_windowSize.x, m_windowSize.y), "Chess Game")),
-      m_board(Board(m_windowSize.getSmallestAxis() * 4 / 5)),
-      m_pieceTextures(PieceTextures::getPieceTextures())
+      m_board(Board(m_windowSize.getSmallestAxis() * 4 / 5)), m_pieceTextures(getPieceTextures())
 {
     m_window.setVerticalSyncEnabled(true);
     m_board.setCenterPosition(m_windowSize);

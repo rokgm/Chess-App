@@ -1,4 +1,4 @@
-add_library(gui Board.cpp Board.h Game.cpp Game.h PieceTextures.cpp PieceTextures.h)
+add_library(gui Board.cpp Board.h Game.cpp Game.h)
 
 target_link_libraries(gui
     PRIVATE
