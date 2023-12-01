@@ -97,7 +97,7 @@ void Game::drawPosition()
     auto boardFieldSize = boardGlobalBounds.width / 8;
 
     for (const auto& [pieceType, bitPiecePositions] : m_boardPosition.getBoardPosition()) {
-        auto integerPositions = BoardPosition::findSetBits(bitPiecePositions);
+        auto integerPositions = BoardPosition::getIndicesForSetBits(bitPiecePositions);
         sf::Sprite pieceSprite(m_pieceTextures[pieceType]);
         pieceSprite.scale(boardFieldSize / pieceSprite.getLocalBounds().width,
                           boardFieldSize / pieceSprite.getLocalBounds().height);

@@ -52,7 +52,7 @@ public:
 
     const std::unordered_map<Piece, uint64_t>& getBoardPosition() const;
 
-    static std::vector<int> findSetBits(uint64_t num);
+    static std::vector<int> getIndicesForSetBits(uint64_t num);
 
 private:
     std::unordered_map<Piece, uint64_t> getStartingBoardPosition() const;

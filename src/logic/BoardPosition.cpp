@@ -41,7 +41,7 @@ void setStartingPosition(BoardPosition::Piece piece,
 
 } // namespace
 
-std::vector<int> BoardPosition::findSetBits(uint64_t num)
+std::vector<int> BoardPosition::getIndicesForSetBits(uint64_t num)
 {
     std::vector<int> positions;
 
