@@ -45,8 +45,8 @@ std::unordered_map<BoardPosition::Piece, sf::Texture> getPieceTextures()
 Game::Game(unsigned int windowWidth, unsigned int windowHeight)
     : m_windowSize(windowWidth, windowHeight),
       m_window(sf::RenderWindow(sf::VideoMode(m_windowSize.x, m_windowSize.y), "Chess Game")),
-      m_board(Board(m_windowSize.getSmallestAxis() * 4 / 5)), m_pieceTextures(getPieceTextures()),
-      m_boardPosition(BoardPosition())
+      m_board(Board(m_windowSize.getSmallestAxis() * 4 / 5)), m_boardPosition(BoardPosition()),
+      m_pieceTextures(getPieceTextures())
 {
     m_window.setVerticalSyncEnabled(true);
     m_board.setCenterPosition(m_windowSize);
@@ -80,7 +80,7 @@ void Game::handleEvents()
 }
 
 void Game::drawPieceType(BoardPosition::Piece type, int position,
-                         const sf::FloatRect& boardGlobalBounds, const float& boardFieldSize)
+                         const sf::FloatRect& boardGlobalBounds, float boardFieldSize)
 {
     if (type == BoardPosition::Piece::empty) {
         return;
@@ -88,8 +88,9 @@ void Game::drawPieceType(BoardPosition::Piece type, int position,
     sf::Sprite pieceSprite(m_pieceTextures[type]);
     pieceSprite.scale(boardFieldSize / pieceSprite.getLocalBounds().width,
                       boardFieldSize / pieceSprite.getLocalBounds().height);
-    pieceSprite.setPosition(boardGlobalBounds.left + boardFieldSize * (position % 8),
-                            boardGlobalBounds.top + boardFieldSize * (position / 8));
+    pieceSprite.setPosition(
+        boardGlobalBounds.left + boardFieldSize * static_cast<float>(position % 8),
+        boardGlobalBounds.top + boardFieldSize * static_cast<float>(position / 8));
     m_window.draw(pieceSprite);
 }
 

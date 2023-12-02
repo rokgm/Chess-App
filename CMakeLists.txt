@@ -47,9 +47,9 @@ add_executable(${PROJECT_NAME} WIN32 src/main.cpp)
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
     sfml-graphics
+    $<$<PLATFORM_ID:Windows>:sfml-main>
     gui
-    logger
-    sfml-main
+    logger    
 )
 
 target_compile_definitions(${PROJECT_NAME}

@@ -36,7 +36,7 @@ private:
     void handleWindowResize(const sf::Event& event);
     void drawPosition();
     void drawPieceType(BoardPosition::Piece type, int position,
-                       const sf::FloatRect& boardGlobalBounds, const float& boardFieldSize);
+                       const sf::FloatRect& boardGlobalBounds, float boardFieldSize);
 
 private:
     WindowSize m_windowSize;
