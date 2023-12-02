@@ -23,7 +23,8 @@ public:
         blackKnight,
         blackRook,
         blackKing,
-        blackQueen
+        blackQueen,
+        empty
     };
 
     inline const static std::unordered_map<Piece, int> pieceValues = {
@@ -37,28 +38,21 @@ public:
 
 public:
     /**
-     * Create a board position of 64 bit numbers (8x8) representing position for
-     * each type of piece. 1 for piece, 0 for empty. First digit from the right represents
-     * (0,0) position on board (upper left).\n
-     * (0, 0) ... (0, 7) \n
-     *   .           .   \n
-     *   .           .   \n
-     *   .           .   \n
-     * (7, 0) ... (7, 7) \n
+     * Create a board position of std::array<Piece, 64> representing 8x8 board. First element
+     * in array is at upper left on board and they continue to the right of the board an then
+     * next row.
      *
      * Starting board position is usual chess starting position.
      */
     BoardPosition();
 
-    const std::unordered_map<Piece, uint64_t>& getBoardPosition() const;
-
-    static std::vector<int> getIndicesForSetBits(uint64_t num);
+    const std::array<Piece, 64>& getBoardPosition() const;
 
 private:
-    std::unordered_map<Piece, uint64_t> getStartingBoardPosition() const;
+    std::array<Piece, 64> getStartingBoardPosition() const;
 
 private:
-    std::unordered_map<Piece, uint64_t> m_boardPosition;
+    std::array<Piece, 64> m_boardPosition;
 };
 
 } // namespace chessAi
