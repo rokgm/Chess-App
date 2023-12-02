@@ -42,32 +42,25 @@ FetchContent_Declare(spdlog
 FetchContent_MakeAvailable(SFML spdlog)
 
 # PROJECT CHESS-AI
-add_executable(${PROJECT_NAME} src/main.cpp)
+add_executable(${PROJECT_NAME} WIN32 src/main.cpp)
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
-    spdlog::spdlog
     sfml-graphics
     gui
+    logger
+    sfml-main
 )
-# Make it a Gui App in Release Mode
-if (WIN32 AND CMAKE_BUILD_TYPE STREQUAL "Release")
-    message("Setting application type to GUI for release build.")
-    set_target_properties(${PROJECT_NAME} PROPERTIES WIN32_EXECUTABLE TRUE)
-    target_link_libraries(${PROJECT_NAME}
-        PRIVATE
-        sfml-main
-    )
-endif()  
-
 
 target_compile_definitions(${PROJECT_NAME}
     PRIVATE
     $<$<CONFIG:Debug>:DEBUG>
     $<$<CONFIG:Release>:RELEASE>
+)
 
-    $<$<CONFIG:Debug>:SPDLOG_ACTIVE_LEVEL=0>
-    $<$<CONFIG:Release>:SPDLOG_ACTIVE_LEVEL=2>
+target_precompile_headers(${PROJECT_NAME}
+    PUBLIC
+    [["logger/Logger.h"]]
 )
 
 # SFML needs this

@@ -1,7 +1,5 @@
 #include "Board.h"
 
-#include "spdlog/spdlog.h"
-
 namespace chessAi
 {
 
@@ -38,7 +36,7 @@ void generateBoardFields(sf::RenderTexture& board, float fieldSize)
 Board::Board(unsigned int boardSize) : m_boardSize(boardSize)
 {
     if (!m_boardTexture.create(m_boardSize, m_boardSize)) {
-        SPDLOG_ERROR("Board texture could not be created.");
+        CHESS_LOG_ERROR("Board texture could not be created.");
     }
     m_boardTexture.clear();
     generateBoardFields(m_boardTexture, static_cast<float>(boardSize) / 8);

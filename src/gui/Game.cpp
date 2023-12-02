@@ -1,7 +1,5 @@
 #include "Game.h"
 
-#include "spdlog/spdlog.h"
-
 namespace chessAi
 {
 
@@ -30,12 +28,12 @@ std::unordered_map<BoardPosition::Piece, sf::Texture> getPieceTextures()
     for (const auto& [piece, fileName] : pieceToFileName) {
         sf::Texture texture;
         if (!texture.loadFromFile("pieces_images/" + fileName)) {
-            SPDLOG_ERROR("File {} couldn't be opened.", fileName);
+            CHESS_LOG_ERROR("File {} couldn't be opened.", fileName);
         }
         texture.setSmooth(true);
-        SPDLOG_TRACE("Texture loaded from file {}.", fileName);
+        CHESS_LOG_TRACE("Texture loaded from file {}.", fileName);
         if (!textures.insert({piece, std::move(texture)}).second) {
-            SPDLOG_ERROR("Texture {} couldn't be inserted to piece textures map.", fileName);
+            CHESS_LOG_ERROR("Texture {} couldn't be inserted to piece textures map.", fileName);
         }
     }
 

@@ -1,7 +1,5 @@
 #include "BoardPosition.h"
 
-#include "spdlog/spdlog.h"
-
 #include <vector>
 
 namespace chessAi
