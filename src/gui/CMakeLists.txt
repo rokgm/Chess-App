@@ -14,8 +14,8 @@ target_include_directories(gui
 
 target_precompile_headers(gui
     PRIVATE
-    <SFML/Graphics.hpp>
     [["logger/Logger.h"]]
+    <SFML/Graphics.hpp>
 )
 
 target_compile_definitions(gui

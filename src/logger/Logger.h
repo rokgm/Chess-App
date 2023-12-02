@@ -14,7 +14,7 @@ public:
     /**
      * Create a file logger.
      *
-     * @param path Path to where log file is created.
+     * @param path Path to where the log file is created.
      */
     static void Init(const std::string& path);
 

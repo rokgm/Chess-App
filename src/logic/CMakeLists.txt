@@ -15,6 +15,9 @@ target_include_directories(logic
 target_precompile_headers(logic
     PRIVATE
     [["logger/Logger.h"]]
+    <unordered_map>
+    <vector>
+    <array>
 )
 
 target_compile_definitions(logic

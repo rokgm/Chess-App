@@ -1,7 +1,5 @@
 #include "BoardPosition.h"
 
-#include <vector>
-
 namespace chessAi
 {
 
