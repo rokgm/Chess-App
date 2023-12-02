@@ -81,14 +81,18 @@ void Game::handleEvents()
     }
 }
 
-void Game::drawPieceType(const std::vector<int>& positions, sf::Sprite& pieceSprite,
+void Game::drawPieceType(BoardPosition::Piece type, int position,
                          const sf::FloatRect& boardGlobalBounds, const float& boardFieldSize)
 {
-    for (const auto& position : positions) {
-        pieceSprite.setPosition(boardGlobalBounds.left + boardFieldSize * (position % 8),
-                                boardGlobalBounds.top + boardFieldSize * (position / 8));
-        m_window.draw(pieceSprite);
+    if (type == BoardPosition::Piece::empty) {
+        return;
     }
+    sf::Sprite pieceSprite(m_pieceTextures[type]);
+    pieceSprite.scale(boardFieldSize / pieceSprite.getLocalBounds().width,
+                      boardFieldSize / pieceSprite.getLocalBounds().height);
+    pieceSprite.setPosition(boardGlobalBounds.left + boardFieldSize * (position % 8),
+                            boardGlobalBounds.top + boardFieldSize * (position / 8));
+    m_window.draw(pieceSprite);
 }
 
 void Game::drawPosition()
@@ -96,12 +100,10 @@ void Game::drawPosition()
     auto boardGlobalBounds = m_board.getBoardSprite().getGlobalBounds();
     auto boardFieldSize = boardGlobalBounds.width / 8;
 
-    for (const auto& [pieceType, bitPiecePositions] : m_boardPosition.getBoardPosition()) {
-        auto integerPositions = BoardPosition::getIndicesForSetBits(bitPiecePositions);
-        sf::Sprite pieceSprite(m_pieceTextures[pieceType]);
-        pieceSprite.scale(boardFieldSize / pieceSprite.getLocalBounds().width,
-                          boardFieldSize / pieceSprite.getLocalBounds().height);
-        drawPieceType(integerPositions, pieceSprite, boardGlobalBounds, boardFieldSize);
+    int position = 0;
+    for (auto pieceType : m_boardPosition.getBoardPosition()) {
+        drawPieceType(pieceType, position, boardGlobalBounds, boardFieldSize);
+        ++position;
     }
 }
 

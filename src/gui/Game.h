@@ -35,7 +35,7 @@ private:
     void displayGameSprites();
     void handleWindowResize(const sf::Event& event);
     void drawPosition();
-    void drawPieceType(const std::vector<int>& positions, sf::Sprite& pieceSprite,
+    void drawPieceType(BoardPosition::Piece type, int position,
                        const sf::FloatRect& boardGlobalBounds, const float& boardFieldSize);
 
 private:
