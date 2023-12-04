@@ -48,7 +48,7 @@ private:
     Board m_board;
     BoardState m_boardState;
     std::unordered_map<BoardState::Piece, sf::Texture> m_pieceTextures;
-    std::pair<BoardState::Piece, unsigned int> m_selectedPieceOldPosition;
+    std::pair<BoardState::Piece, std::optional<unsigned int>> m_selectedPieceOldPosition;
 };
 
 } // namespace chessAi

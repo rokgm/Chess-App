@@ -64,10 +64,11 @@ void Game::handleWindowResize(const sf::Event& event)
 
 bool Game::determineMousePressedOnBoard(int x, int y)
 {
-    return m_board.getBoardSprite().getGlobalBounds().left < static_cast<float>(x) &&
-           static_cast<float>(x) < m_board.getBoardSprite().getGlobalBounds().width &&
-           m_board.getBoardSprite().getGlobalBounds().top < static_cast<float>(y) &&
-           static_cast<float>(y) < m_board.getBoardSprite().getGlobalBounds().height;
+    auto bounds = m_board.getBoardSprite().getGlobalBounds();
+    return bounds.left < static_cast<float>(x) &&
+           static_cast<float>(x) < (bounds.width + bounds.left) &&
+           bounds.top < static_cast<float>(y) &&
+           static_cast<float>(y) < (bounds.height + bounds.top);
 }
 
 void Game::handleMousePressed(const sf::Event& event)
@@ -76,39 +77,41 @@ void Game::handleMousePressed(const sf::Event& event)
         CHESS_LOG_TRACE("Mouse not pressed on board.");
         return;
     }
-    // Both x (starting left) and y (starting top) are part of the interval [1, 8],
-    // instead of [0, 7] as we are used to.
-    int positionX = event.mouseButton.x * 8 /
-                    static_cast<int>(m_board.getBoardSprite().getGlobalBounds().width);
-    int positionY = event.mouseButton.y * 8 /
-                    static_cast<int>(m_board.getBoardSprite().getGlobalBounds().height);
+    // Both x (starting left) and y (starting top) are part of the interval [0, 7].
+    auto boardBounds = m_board.getBoardSprite().getGlobalBounds();
+    unsigned int positionX = static_cast<unsigned int>(
+        (static_cast<float>(event.mouseButton.x) - boardBounds.left) * 8 / boardBounds.width);
+    unsigned int positionY = static_cast<unsigned int>(
+        (static_cast<float>(event.mouseButton.y) - boardBounds.top) * 8 / boardBounds.height);
 
-    if (m_selectedPieceOldPosition.second == 0) {
-        movePiece(positionX, positionY, true);
+    CHESS_LOG_TRACE("positionX: {}, positionY: {}", positionX, positionY);
+
+    if (m_selectedPieceOldPosition.second.has_value()) {
+        movePiece(positionX, positionY, false);
     }
     else {
-        movePiece(positionX, positionY, false);
+        movePiece(positionX, positionY, true);
     }
 }
 
 void Game::movePiece(unsigned int positionX, unsigned int positionY, bool noSelectedPiece)
 {
 
-    int positionOnBoard = (positionX - 1) + (positionY - 1) * 8;
+    int positionOnBoard = (positionX) + (positionY) * 8;
 
     if (noSelectedPiece) {
         if (m_boardState.getBoardState()[positionOnBoard] != BoardState::Piece::empty) {
             BoardState::Piece pieceType = m_boardState.getBoardState()[positionOnBoard];
-            // We add 1 to the positionOnBoard to distinguish between an empty pair and a non-empty
-            // pair which has the position set at 0
-            m_selectedPieceOldPosition = {pieceType, positionOnBoard + 1};
+            m_selectedPieceOldPosition = {pieceType, positionOnBoard};
         }
     }
     else {
-        // TODO: be careful position + 1. Change this to be as usual.
+        if (!m_selectedPieceOldPosition.second.has_value()) {
+            CHESS_LOG_ERROR("Moving piece with no current (old) position.");
+        }
         m_boardState.updateBoardState(m_selectedPieceOldPosition.first,
-                                      m_selectedPieceOldPosition.second - 1, positionOnBoard);
-        m_selectedPieceOldPosition = {BoardState::Piece::empty, 0};
+                                      *m_selectedPieceOldPosition.second, positionOnBoard);
+        m_selectedPieceOldPosition = {BoardState::Piece::empty, std::nullopt};
     }
 }
 
