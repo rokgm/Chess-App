@@ -72,7 +72,7 @@ void Game::handleMousePressed(const sf::Event& event)
                     static_cast<int>(m_board.getBoardSprite().getGlobalBounds().height);
 
     if (0 < positionX && positionX < 9 && 0 < positionY && positionY < 9) {
-        if (m_selectedPiece.second == 0) {
+        if (m_selectedPieceOldPosition.second == 0) {
             movePiece(positionX, positionY, true);
         }
         else {
@@ -94,12 +94,14 @@ void Game::movePiece(unsigned int positionX, unsigned int positionY, bool noSele
             BoardState::Piece pieceType = m_boardState.getBoardState()[positionOnBoard];
             // We add 1 to the positionOnBoard to distinguish between an empty pair and a non-empty
             // pair which has the position set at 0
-            m_selectedPiece = {pieceType, positionOnBoard + 1};
+            m_selectedPieceOldPosition = {pieceType, positionOnBoard + 1};
         }
     }
     else {
-        m_boardState.updateBoardState(m_selectedPiece, positionOnBoard);
-        m_selectedPiece = {BoardState::Piece::empty, 0};
+        // TODO: be careful position + 1. Change this to be as usual.
+        m_boardState.updateBoardState(m_selectedPieceOldPosition.first,
+                                      m_selectedPieceOldPosition.second - 1, positionOnBoard);
+        m_selectedPieceOldPosition = {BoardState::Piece::empty, 0};
     }
 }
 

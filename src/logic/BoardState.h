@@ -27,6 +27,8 @@ public:
         empty
     };
 
+    // TODO: Move this to minimax engine class when it is implemented. Probably doesn't
+    // belong here.
     inline const static std::unordered_map<Piece, int> pieceValues = {
         {Piece::whitePawn, 1},    {Piece::whiteBishop, 3},
         {Piece::whiteKnight, 3},  {Piece::whiteRook, 5},
@@ -47,8 +49,7 @@ public:
     BoardState();
 
     const std::array<Piece, 64>& getBoardState() const;
-    void setBoardState(std::array<Piece, 64>& newBoardState);
-    void updateBoardState(std::pair<Piece, unsigned int>& selectedPiece, unsigned int newPosition);
+    void updateBoardState(Piece pieceType, unsigned int oldPosition, unsigned int newPosition);
 
 private:
     std::array<Piece, 64> getStartingBoardState() const;

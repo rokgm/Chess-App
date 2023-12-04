@@ -5,6 +5,7 @@
 
 #include <SFML/Graphics.hpp>
 
+#include <optional>
 #include <unordered_map>
 
 namespace chessAi
@@ -46,7 +47,7 @@ private:
     Board m_board;
     BoardState m_boardState;
     std::unordered_map<BoardState::Piece, sf::Texture> m_pieceTextures;
-    std::pair<BoardState::Piece, unsigned int> m_selectedPiece;
+    std::pair<BoardState::Piece, unsigned int> m_selectedPieceOldPosition;
 };
 
 } // namespace chessAi
