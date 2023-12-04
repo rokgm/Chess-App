@@ -36,19 +36,24 @@ std::array<BoardState::Piece, 64> BoardState::getStartingBoardState() const
     return boardState;
 }
 
-std::array<BoardState::Piece, 64>& BoardState::getBoardState()
+const std::array<BoardState::Piece, 64>& BoardState::getBoardState() const
 {
     return m_boardState;
 }
 
-const std::unordered_map<BoardState::Piece, int>& BoardState::getSelectedPiece() const
+void BoardState::setBoardState(std::array<Piece, 64>& newBoardState) 
 {
-    return selectedPiece;
+    m_boardState = newBoardState;
 }
 
-void BoardState::setSelectedPiece(const BoardState::Piece& piece, int position)
-{
-    selectedPiece = {{piece, position}};
+void BoardState::updateBoardState(std::array<BoardState::Piece, 64> old_board, std::pair<BoardState::Piece, int>& selectedPiece, int& positionOnBoard)
+{   
+    std::array<BoardState::Piece, 64> new_board = old_board;
+    // We substract 1 to the positionOnBoard to get the real position on the board which was compromised in order to distinguish
+    // between an empty pair and a non-empty pair which has the position set at 0
+    new_board[selectedPiece.second - 1] = BoardState::Piece::empty;
+    new_board[positionOnBoard] = selectedPiece.first;
+    setBoardState(new_board);
 }
 
 BoardState::BoardState() : m_boardState(getStartingBoardState())

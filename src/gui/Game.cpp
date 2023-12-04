@@ -62,7 +62,17 @@ void Game::handleWindowResize(const sf::Event& event)
     m_board.setCenterPosition(m_windowSize);
 }
 
-void Game::movePiece(const sf::Event& event)
+const std::pair<BoardState::Piece, int>& Game::getSelectedPiece() const
+{
+    return selectedPiece;
+}
+
+void Game::setSelectedPiece(const BoardState::Piece& piece, int position)
+{   
+    selectedPiece = {piece, position};
+}
+
+void Game::handleMousePressed(const sf::Event& event)
 {
     // Both x (starting left) and y (starting top) are part of the interval [1, 8], intead of [0, 7]
     // as we are used to
@@ -70,23 +80,37 @@ void Game::movePiece(const sf::Event& event)
                      static_cast<int>(m_board.getBoardSprite().getGlobalBounds().width);
     int position_y = event.mouseButton.y * 8 /
                      static_cast<int>(m_board.getBoardSprite().getGlobalBounds().height);
-    int position_on_board = (position_x - 1) + (position_y - 1) * 8;
-
-    std::unordered_map<BoardState::Piece, int> selectedPiece = m_boardState.getSelectedPiece();
-
-    if (selectedPiece.count(BoardState::Piece::empty) == 1 || selectedPiece.empty()) {
-        if (m_boardState.getBoardState()[position_on_board] != BoardState::Piece::empty) {
-            BoardState::Piece pieceType = m_boardState.getBoardState()[position_on_board];
-            m_boardState.setSelectedPiece(pieceType, position_on_board);
+    
+    if (0 < position_x && position_x < 9 && 0 < position_y && position_y < 9) {
+        if (selectedPiece.second == 0) {
+            movePiece(position_x, position_y, true);
+        }
+        else {
+            movePiece(position_x, position_y, false);
         }
     }
     else {
-        for (const auto& keyAndValue : selectedPiece) {
-            m_boardState.getBoardState()[keyAndValue.second] = BoardState::Piece::empty;
-            m_boardState.getBoardState()[position_on_board] = keyAndValue.first;
-        }
-        m_boardState.setSelectedPiece(BoardState::Piece::empty, -1);
+        CHESS_LOG_TRACE("Unsuitable position selected!");
     }
+}
+
+void Game::movePiece(int& position_x, int& position_y, bool noSelectedPiece) 
+{
+
+    int positionOnBoard = (position_x - 1) + (position_y - 1) * 8;
+
+    if (noSelectedPiece) {
+        if (m_boardState.getBoardState()[positionOnBoard] != BoardState::Piece::empty) {
+            BoardState::Piece pieceType = m_boardState.getBoardState()[positionOnBoard];
+            // We add 1 to the positionOnBoard to distinguish between an empty pair and a non-empty pair which has the position set at 0
+            setSelectedPiece(pieceType, positionOnBoard + 1);
+        }
+    }
+    else {
+        m_boardState.updateBoardState(m_boardState.getBoardState(), selectedPiece, positionOnBoard);
+        setSelectedPiece(BoardState::Piece::empty, 0);
+    }
+    
 }
 
 void Game::handleEvents()
@@ -101,7 +125,7 @@ void Game::handleEvents()
             handleWindowResize(event);
             break;
         case sf::Event::MouseButtonPressed:
-            movePiece(event);
+            handleMousePressed(event);
             break;
         default:
             break;

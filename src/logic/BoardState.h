@@ -46,12 +46,9 @@ public:
      */
     BoardState();
 
-    // TODO: Fix this, should return const and be const function.
-    std::array<Piece, 64>& getBoardState();
-
-    const std::unordered_map<Piece, int>& getSelectedPiece() const;
-
-    void setSelectedPiece(const BoardState::Piece& piece, int position);
+    const std::array<Piece, 64>& getBoardState() const;
+    void setBoardState(std::array<Piece, 64>& newBoardState);
+    void updateBoardState(std::array<Piece, 64> old_board, std::pair<Piece, int>& selectedPiece, int& newPosition);
 
 private:
     std::array<Piece, 64> getStartingBoardState() const;
@@ -59,8 +56,6 @@ private:
 private:
     std::array<Piece, 64> m_boardState;
 
-private:
-    std::unordered_map<Piece, int> selectedPiece;
 };
 
 } // namespace chessAi
