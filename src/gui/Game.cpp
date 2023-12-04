@@ -62,6 +62,34 @@ void Game::handleWindowResize(const sf::Event& event)
     m_board.setCenterPosition(m_windowSize);
 }
 
+void Game::movePiece(const sf::Event& event) 
+{
+    // Both x (starting left) and y (starting top) are part of the interval [1, 8], intead of [0, 7] as we are used to
+    int position_x = event.mouseButton.x * 8 / static_cast<int>(m_board.getBoardSprite().getGlobalBounds().width); 
+    int position_y = event.mouseButton.y * 8 / static_cast<int>(m_board.getBoardSprite().getGlobalBounds().height);
+    int position_on_board = (position_x - 1) + (position_y - 1) * 8;
+
+    std::unordered_map<BoardPosition::Piece, int> selectedPiece = m_boardPosition.getSelectedPiece();
+    
+
+    if (selectedPiece.count(BoardPosition::Piece::empty) == 1 || selectedPiece.empty())
+    {
+        if (m_boardPosition.getBoardPosition()[position_on_board] != BoardPosition::Piece::empty) {
+            BoardPosition::Piece pieceType = m_boardPosition.getBoardPosition()[position_on_board];
+            m_boardPosition.setSelectedPiece(pieceType, position_on_board);
+        }
+    } else {
+        for (const auto& keyAndValue : selectedPiece) {
+            m_boardPosition.getBoardPosition()[keyAndValue.second] = BoardPosition::Piece::empty;
+            m_boardPosition.getBoardPosition()[position_on_board] = keyAndValue.first;
+        }
+        m_boardPosition.setSelectedPiece(BoardPosition::Piece::empty, -1);
+    }
+
+
+
+}
+
 void Game::handleEvents()
 {
     sf::Event event;
@@ -72,6 +100,9 @@ void Game::handleEvents()
             break;
         case sf::Event::Resized:
             handleWindowResize(event);
+            break;
+        case sf::Event::MouseButtonPressed:
+            movePiece(event);
             break;
         default:
             break;

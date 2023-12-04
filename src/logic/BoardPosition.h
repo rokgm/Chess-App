@@ -46,13 +46,20 @@ public:
      */
     BoardPosition();
 
-    const std::array<Piece, 64>& getBoardPosition() const;
+    std::array<Piece, 64>& getBoardPosition();
+
+    const std::unordered_map<Piece, int>& getSelectedPiece() const;
+
+    void setSelectedPiece(const BoardPosition::Piece& piece, int position);
 
 private:
     std::array<Piece, 64> getStartingBoardPosition() const;
 
 private:
     std::array<Piece, 64> m_boardPosition;
+
+private:
+    std::unordered_map<Piece, int> selectedPiece;
 };
 
 } // namespace chessAi

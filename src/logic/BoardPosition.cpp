@@ -36,9 +36,21 @@ std::array<BoardPosition::Piece, 64> BoardPosition::getStartingBoardPosition() c
     return boardPosition;
 }
 
-const std::array<BoardPosition::Piece, 64>& BoardPosition::getBoardPosition() const
+std::array<BoardPosition::Piece, 64>& BoardPosition::getBoardPosition()
 {
     return m_boardPosition;
+}
+
+
+
+const std::unordered_map<BoardPosition::Piece, int>& BoardPosition::getSelectedPiece() const
+{
+    return selectedPiece;
+}
+
+void BoardPosition::setSelectedPiece(const BoardPosition::Piece& piece, int position)  
+{
+    selectedPiece = {{piece, position}};
 }
 
 BoardPosition::BoardPosition() : m_boardPosition(getStartingBoardPosition())
