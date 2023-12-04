@@ -71,48 +71,55 @@ bool Game::determineMousePressedOnBoard(int x, int y)
            static_cast<float>(y) < (bounds.height + bounds.top);
 }
 
+std::pair<unsigned int, unsigned int> Game::calculatePositionOnBoard(unsigned int x, unsigned int y)
+{
+    // Both x (starting left) and y (starting top) are part of the interval [0, 7].
+    auto boardBounds = m_board.getBoardSprite().getGlobalBounds();
+    unsigned int positionX = static_cast<unsigned int>((static_cast<float>(x) - boardBounds.left) *
+                                                       8 / boardBounds.width);
+    unsigned int positionY = static_cast<unsigned int>((static_cast<float>(y) - boardBounds.top) *
+                                                       8 / boardBounds.height);
+    return {std::move(positionX), std::move(positionY)};
+}
+
 void Game::handleMousePressed(const sf::Event& event)
 {
     if (!determineMousePressedOnBoard(event.mouseButton.x, event.mouseButton.y)) {
         CHESS_LOG_TRACE("Mouse not pressed on board.");
         return;
     }
-    // Both x (starting left) and y (starting top) are part of the interval [0, 7].
-    auto boardBounds = m_board.getBoardSprite().getGlobalBounds();
-    unsigned int positionX = static_cast<unsigned int>(
-        (static_cast<float>(event.mouseButton.x) - boardBounds.left) * 8 / boardBounds.width);
-    unsigned int positionY = static_cast<unsigned int>(
-        (static_cast<float>(event.mouseButton.y) - boardBounds.top) * 8 / boardBounds.height);
-
+    auto [positionX, positionY] =
+        calculatePositionOnBoard(event.mouseButton.x, event.mouseButton.y);
     CHESS_LOG_TRACE("positionX: {}, positionY: {}", positionX, positionY);
 
-    if (m_selectedPieceOldPosition.second.has_value()) {
-        movePiece(positionX, positionY, false);
+    if (m_selectedPieceAndPosition.second.has_value()) {
+        movePiece(positionX, positionY);
     }
     else {
-        movePiece(positionX, positionY, true);
+        setSelectedPiece(positionX, positionY);
     }
 }
 
-void Game::movePiece(unsigned int positionX, unsigned int positionY, bool noSelectedPiece)
+void Game::setSelectedPiece(unsigned int positionX, unsigned int positionY)
+{
+    unsigned int positionOnBoard = positionX + positionY * 8;
+    if (m_boardState.getBoardState()[positionOnBoard] != BoardState::Piece::empty) {
+        BoardState::Piece pieceType = m_boardState.getBoardState()[positionOnBoard];
+        m_selectedPieceAndPosition = {pieceType, positionOnBoard};
+    }
+}
+
+void Game::movePiece(unsigned int positionX, unsigned int positionY)
 {
 
-    int positionOnBoard = (positionX) + (positionY) * 8;
-
-    if (noSelectedPiece) {
-        if (m_boardState.getBoardState()[positionOnBoard] != BoardState::Piece::empty) {
-            BoardState::Piece pieceType = m_boardState.getBoardState()[positionOnBoard];
-            m_selectedPieceOldPosition = {pieceType, positionOnBoard};
-        }
+    int positionOnBoard = positionX + positionY * 8;
+    if (!m_selectedPieceAndPosition.second.has_value()) {
+        CHESS_LOG_ERROR("Moving piece with no current (old) position.");
+        return;
     }
-    else {
-        if (!m_selectedPieceOldPosition.second.has_value()) {
-            CHESS_LOG_ERROR("Moving piece with no current (old) position.");
-        }
-        m_boardState.updateBoardState(m_selectedPieceOldPosition.first,
-                                      *m_selectedPieceOldPosition.second, positionOnBoard);
-        m_selectedPieceOldPosition = {BoardState::Piece::empty, std::nullopt};
-    }
+    m_boardState.updateBoardState(m_selectedPieceAndPosition.first,
+                                  *m_selectedPieceAndPosition.second, positionOnBoard);
+    m_selectedPieceAndPosition = {BoardState::Piece::empty, std::nullopt};
 }
 
 void Game::handleEvents()
