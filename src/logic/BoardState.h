@@ -48,14 +48,13 @@ public:
 
     const std::array<Piece, 64>& getBoardState() const;
     void setBoardState(std::array<Piece, 64>& newBoardState);
-    void updateBoardState(std::array<Piece, 64> old_board, std::pair<Piece, int>& selectedPiece, int& newPosition);
+    void updateBoardState(std::pair<Piece, unsigned int>& selectedPiece, unsigned int newPosition);
 
 private:
     std::array<Piece, 64> getStartingBoardState() const;
 
 private:
     std::array<Piece, 64> m_boardState;
-
 };
 
 } // namespace chessAi

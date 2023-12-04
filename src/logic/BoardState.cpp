@@ -41,19 +41,22 @@ const std::array<BoardState::Piece, 64>& BoardState::getBoardState() const
     return m_boardState;
 }
 
-void BoardState::setBoardState(std::array<Piece, 64>& newBoardState) 
+void BoardState::setBoardState(std::array<Piece, 64>& newBoardState)
 {
     m_boardState = newBoardState;
 }
 
-void BoardState::updateBoardState(std::array<BoardState::Piece, 64> old_board, std::pair<BoardState::Piece, int>& selectedPiece, int& positionOnBoard)
-{   
-    std::array<BoardState::Piece, 64> new_board = old_board;
-    // We substract 1 to the positionOnBoard to get the real position on the board which was compromised in order to distinguish
-    // between an empty pair and a non-empty pair which has the position set at 0
-    new_board[selectedPiece.second - 1] = BoardState::Piece::empty;
-    new_board[positionOnBoard] = selectedPiece.first;
-    setBoardState(new_board);
+void BoardState::updateBoardState(std::pair<BoardState::Piece, unsigned int>& selectedPiece,
+                                  unsigned int positionOnBoard)
+{
+    if (m_boardState[selectedPiece.second - 1] != selectedPiece.first) {
+        CHESS_LOG_ERROR("Moving piece from square where it doesn't exits.");
+    }
+    // We substract 1 to the positionOnBoard to get the real position on the board which was
+    // compromised in order to distinguish between an empty pair and a non-empty pair which has the
+    // position set at 0
+    m_boardState[selectedPiece.second - 1] = BoardState::Piece::empty;
+    m_boardState[positionOnBoard] = selectedPiece.first;
 }
 
 BoardState::BoardState() : m_boardState(getStartingBoardState())

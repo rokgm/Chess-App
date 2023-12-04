@@ -84,7 +84,7 @@ void Game::handleMousePressed(const sf::Event& event)
     }
 }
 
-void Game::movePiece(int positionX, int positionY, bool noSelectedPiece)
+void Game::movePiece(unsigned int positionX, unsigned int positionY, bool noSelectedPiece)
 {
 
     int positionOnBoard = (positionX - 1) + (positionY - 1) * 8;
@@ -98,8 +98,7 @@ void Game::movePiece(int positionX, int positionY, bool noSelectedPiece)
         }
     }
     else {
-        m_boardState.updateBoardState(m_boardState.getBoardState(), m_selectedPiece,
-                                      positionOnBoard);
+        m_boardState.updateBoardState(m_selectedPiece, positionOnBoard);
         m_selectedPiece = {BoardState::Piece::empty, 0};
     }
 }
@@ -124,7 +123,7 @@ void Game::handleEvents()
     }
 }
 
-void Game::drawPieceType(BoardState::Piece type, int position,
+void Game::drawPieceType(BoardState::Piece type, unsigned int position,
                          const sf::FloatRect& boardGlobalBounds, float boardFieldSize)
 {
     if (type == BoardState::Piece::empty) {
