@@ -62,31 +62,21 @@ void Game::handleWindowResize(const sf::Event& event)
     m_board.setCenterPosition(m_windowSize);
 }
 
-const std::pair<BoardState::Piece, int>& Game::getSelectedPiece() const
-{
-    return selectedPiece;
-}
-
-void Game::setSelectedPiece(const BoardState::Piece& piece, int position)
-{   
-    selectedPiece = {piece, position};
-}
-
 void Game::handleMousePressed(const sf::Event& event)
 {
-    // Both x (starting left) and y (starting top) are part of the interval [1, 8], intead of [0, 7]
-    // as we are used to
-    int position_x = event.mouseButton.x * 8 /
-                     static_cast<int>(m_board.getBoardSprite().getGlobalBounds().width);
-    int position_y = event.mouseButton.y * 8 /
-                     static_cast<int>(m_board.getBoardSprite().getGlobalBounds().height);
-    
-    if (0 < position_x && position_x < 9 && 0 < position_y && position_y < 9) {
-        if (selectedPiece.second == 0) {
-            movePiece(position_x, position_y, true);
+    // Both x (starting left) and y (starting top) are part of the interval [1, 8],
+    // instead of [0, 7] as we are used to.
+    int positionX = event.mouseButton.x * 8 /
+                    static_cast<int>(m_board.getBoardSprite().getGlobalBounds().width);
+    int positionY = event.mouseButton.y * 8 /
+                    static_cast<int>(m_board.getBoardSprite().getGlobalBounds().height);
+
+    if (0 < positionX && positionX < 9 && 0 < positionY && positionY < 9) {
+        if (m_selectedPiece.second == 0) {
+            movePiece(positionX, positionY, true);
         }
         else {
-            movePiece(position_x, position_y, false);
+            movePiece(positionX, positionY, false);
         }
     }
     else {
@@ -94,23 +84,24 @@ void Game::handleMousePressed(const sf::Event& event)
     }
 }
 
-void Game::movePiece(int& position_x, int& position_y, bool noSelectedPiece) 
+void Game::movePiece(int positionX, int positionY, bool noSelectedPiece)
 {
 
-    int positionOnBoard = (position_x - 1) + (position_y - 1) * 8;
+    int positionOnBoard = (positionX - 1) + (positionY - 1) * 8;
 
     if (noSelectedPiece) {
         if (m_boardState.getBoardState()[positionOnBoard] != BoardState::Piece::empty) {
             BoardState::Piece pieceType = m_boardState.getBoardState()[positionOnBoard];
-            // We add 1 to the positionOnBoard to distinguish between an empty pair and a non-empty pair which has the position set at 0
-            setSelectedPiece(pieceType, positionOnBoard + 1);
+            // We add 1 to the positionOnBoard to distinguish between an empty pair and a non-empty
+            // pair which has the position set at 0
+            m_selectedPiece = {pieceType, positionOnBoard + 1};
         }
     }
     else {
-        m_boardState.updateBoardState(m_boardState.getBoardState(), selectedPiece, positionOnBoard);
-        setSelectedPiece(BoardState::Piece::empty, 0);
+        m_boardState.updateBoardState(m_boardState.getBoardState(), m_selectedPiece,
+                                      positionOnBoard);
+        m_selectedPiece = {BoardState::Piece::empty, 0};
     }
-    
 }
 
 void Game::handleEvents()

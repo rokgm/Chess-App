@@ -31,15 +31,11 @@ public:
     void runGame();
 
 private:
-
-    const std::pair<BoardState::Piece, int>& getSelectedPiece() const;
-    void setSelectedPiece(const BoardState::Piece& piece, int position);
-
     void handleEvents();
     void displayGameSprites();
     void handleWindowResize(const sf::Event& event);
     void handleMousePressed(const sf::Event& event);
-    void movePiece(int& x, int& y, bool noSelectedPiece);
+    void movePiece(int positionX, int positionY, bool noSelectedPiece);
     void drawPosition();
     void drawPieceType(BoardState::Piece type, int position, const sf::FloatRect& boardGlobalBounds,
                        float boardFieldSize);
@@ -50,7 +46,7 @@ private:
     Board m_board;
     BoardState m_boardState;
     std::unordered_map<BoardState::Piece, sf::Texture> m_pieceTextures;
-    std::pair<BoardState::Piece, int> selectedPiece;
+    std::pair<BoardState::Piece, int> m_selectedPiece;
 };
 
 } // namespace chessAi
