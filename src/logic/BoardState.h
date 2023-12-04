@@ -7,7 +7,7 @@
 namespace chessAi
 {
 
-class BoardPosition
+class BoardState
 {
 public:
     enum class Piece
@@ -44,19 +44,20 @@ public:
      *
      * Starting board position is usual chess starting position.
      */
-    BoardPosition();
+    BoardState();
 
-    std::array<Piece, 64>& getBoardPosition();
+    // TODO: Fix this, should return const and be const function.
+    std::array<Piece, 64>& getBoardState();
 
     const std::unordered_map<Piece, int>& getSelectedPiece() const;
 
-    void setSelectedPiece(const BoardPosition::Piece& piece, int position);
+    void setSelectedPiece(const BoardState::Piece& piece, int position);
 
 private:
-    std::array<Piece, 64> getStartingBoardPosition() const;
+    std::array<Piece, 64> getStartingBoardState() const;
 
 private:
-    std::array<Piece, 64> m_boardPosition;
+    std::array<Piece, 64> m_boardState;
 
 private:
     std::unordered_map<Piece, int> selectedPiece;

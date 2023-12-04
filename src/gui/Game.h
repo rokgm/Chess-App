@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Board.h"
-#include "logic/BoardPosition.h"
+#include "logic/BoardState.h"
 
 #include <SFML/Graphics.hpp>
 
@@ -36,15 +36,15 @@ private:
     void handleWindowResize(const sf::Event& event);
     void movePiece(const sf::Event& event);
     void drawPosition();
-    void drawPieceType(BoardPosition::Piece type, int position,
-                       const sf::FloatRect& boardGlobalBounds, float boardFieldSize);
+    void drawPieceType(BoardState::Piece type, int position, const sf::FloatRect& boardGlobalBounds,
+                       float boardFieldSize);
 
 private:
     WindowSize m_windowSize;
     sf::RenderWindow m_window;
     Board m_board;
-    BoardPosition m_boardPosition;
-    std::unordered_map<BoardPosition::Piece, sf::Texture> m_pieceTextures;
+    BoardState m_boardState;
+    std::unordered_map<BoardState::Piece, sf::Texture> m_pieceTextures;
 };
 
 } // namespace chessAi

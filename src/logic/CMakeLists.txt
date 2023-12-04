@@ -1,4 +1,4 @@
-add_library(logic BoardPosition.cpp BoardPosition.h)
+add_library(logic BoardState.cpp BoardState.h)
 
 target_link_libraries(logic
     PRIVATE
