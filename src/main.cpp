@@ -2,7 +2,7 @@
 
 int main()
 {
-    chessAi::Logger::Init("log/chess-logs.txt");
+    chessAi::Logger::Init();
 
     chessAi::Game game(800, 800);
     game.runGame();

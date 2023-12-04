@@ -16,7 +16,7 @@ public:
      *
      * @param path Path to where the log file is created.
      */
-    static void Init(const std::string& path);
+    static void Init();
 
     static std::shared_ptr<spdlog::logger>& getLogger()
     {

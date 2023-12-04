@@ -36,6 +36,7 @@ private:
     void displayGameSprites();
     void handleWindowResize(const sf::Event& event);
     void handleMousePressed(const sf::Event& event);
+    bool determineMousePressedOnBoard(int x, int y);
     void movePiece(unsigned int positionX, unsigned int positionY, bool noSelectedPiece);
     void drawPosition();
     void drawPieceType(BoardState::Piece type, unsigned int position,

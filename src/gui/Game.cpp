@@ -62,8 +62,20 @@ void Game::handleWindowResize(const sf::Event& event)
     m_board.setCenterPosition(m_windowSize);
 }
 
+bool Game::determineMousePressedOnBoard(int x, int y)
+{
+    return m_board.getBoardSprite().getGlobalBounds().left < static_cast<float>(x) &&
+           static_cast<float>(x) < m_board.getBoardSprite().getGlobalBounds().width &&
+           m_board.getBoardSprite().getGlobalBounds().top < static_cast<float>(y) &&
+           static_cast<float>(y) < m_board.getBoardSprite().getGlobalBounds().height;
+}
+
 void Game::handleMousePressed(const sf::Event& event)
 {
+    if (!determineMousePressedOnBoard(event.mouseButton.x, event.mouseButton.y)) {
+        CHESS_LOG_TRACE("Mouse not pressed on board.");
+        return;
+    }
     // Both x (starting left) and y (starting top) are part of the interval [1, 8],
     // instead of [0, 7] as we are used to.
     int positionX = event.mouseButton.x * 8 /
@@ -71,16 +83,11 @@ void Game::handleMousePressed(const sf::Event& event)
     int positionY = event.mouseButton.y * 8 /
                     static_cast<int>(m_board.getBoardSprite().getGlobalBounds().height);
 
-    if (0 < positionX && positionX < 9 && 0 < positionY && positionY < 9) {
-        if (m_selectedPieceOldPosition.second == 0) {
-            movePiece(positionX, positionY, true);
-        }
-        else {
-            movePiece(positionX, positionY, false);
-        }
+    if (m_selectedPieceOldPosition.second == 0) {
+        movePiece(positionX, positionY, true);
     }
     else {
-        CHESS_LOG_TRACE("Unsuitable position selected!");
+        movePiece(positionX, positionY, false);
     }
 }
 
