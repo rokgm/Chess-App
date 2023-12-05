@@ -39,8 +39,7 @@ private:
     bool determineMousePressedOnBoard(int x, int y);
     void movePiece(unsigned int positionX, unsigned int positionY);
     void setSelectedPiece(unsigned int positionX, unsigned int positionY);
-    std::pair<unsigned int, unsigned int> Game::calculatePositionOnBoard(unsigned int x,
-                                                                         unsigned int y);
+    std::pair<unsigned int, unsigned int> calculatePositionOnBoard(unsigned int x, unsigned int y);
     void drawPosition();
     void drawPieceType(BoardState::Piece type, unsigned int position,
                        const sf::FloatRect& boardGlobalBounds, float boardFieldSize);
