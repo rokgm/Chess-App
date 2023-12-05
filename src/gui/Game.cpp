@@ -46,7 +46,8 @@ Game::Game(unsigned int windowWidth, unsigned int windowHeight)
     : m_windowSize(windowWidth, windowHeight),
       m_window(sf::RenderWindow(sf::VideoMode(m_windowSize.x, m_windowSize.y), "Chess Game")),
       m_board(Board(m_windowSize.getSmallestAxis() * 4 / 5)), m_boardState(BoardState()),
-      m_pieceTextures(getPieceTextures())
+      m_pieceTextures(getPieceTextures()),
+      m_selectedPieceAndPosition({BoardState::Piece::empty, std::nullopt})
 {
     m_window.setVerticalSyncEnabled(true);
     m_board.setCenterPosition(m_windowSize);
@@ -86,6 +87,7 @@ void Game::handleMousePressed(const sf::Event& event)
 {
     if (!determineMousePressedOnBoard(event.mouseButton.x, event.mouseButton.y)) {
         CHESS_LOG_TRACE("Mouse not pressed on board.");
+        m_selectedPieceAndPosition.second = std::nullopt;
         return;
     }
     auto [positionX, positionY] =
@@ -142,6 +144,19 @@ void Game::handleEvents()
     }
 }
 
+sf::RectangleShape Game::getBoardFieldHighlight(unsigned int boardRow, unsigned int boardColumn)
+{
+    auto boardFieldSize = m_board.getBoardSprite().getGlobalBounds().width / 8;
+    sf::RectangleShape highlight(sf::Vector2f(boardFieldSize, boardFieldSize));
+    // Set transparent orange color.
+    highlight.setFillColor(sf::Color(255, 127, 80, 125));
+    highlight.setPosition(sf::Vector2f(m_board.getBoardSprite().getGlobalBounds().left,
+                                       m_board.getBoardSprite().getGlobalBounds().top) +
+                          boardFieldSize * sf::Vector2f(static_cast<float>(boardColumn),
+                                                        static_cast<float>(boardRow)));
+    return highlight;
+}
+
 void Game::drawPieceType(BoardState::Piece type, unsigned int position,
                          const sf::FloatRect& boardGlobalBounds, float boardFieldSize)
 {
@@ -161,6 +176,11 @@ void Game::drawPosition()
 {
     auto boardGlobalBounds = m_board.getBoardSprite().getGlobalBounds();
     auto boardFieldSize = boardGlobalBounds.width / 8;
+
+    if (m_selectedPieceAndPosition.second.has_value()) {
+        auto position = *m_selectedPieceAndPosition.second;
+        m_window.draw(getBoardFieldHighlight(position / 8, position % 8));
+    }
 
     int position = 0;
     for (auto pieceType : m_boardState.getBoardState()) {

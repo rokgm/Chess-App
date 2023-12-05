@@ -44,6 +44,7 @@ private:
     void drawPosition();
     void drawPieceType(BoardState::Piece type, unsigned int position,
                        const sf::FloatRect& boardGlobalBounds, float boardFieldSize);
+    sf::RectangleShape getBoardFieldHighlight(unsigned int boardRow, unsigned int boardColumn);
 
 private:
     WindowSize m_windowSize;
