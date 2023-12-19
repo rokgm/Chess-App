@@ -29,6 +29,7 @@ std::unordered_map<BoardState::Piece, sf::Texture> getPieceTextures()
         sf::Texture texture;
         if (!texture.loadFromFile("pieces_images/" + fileName)) {
             CHESS_LOG_ERROR("File {} couldn't be opened.", fileName);
+            throw std::runtime_error("Critical error loading piece textures.");
         }
         texture.setSmooth(true);
         CHESS_LOG_TRACE("Texture loaded from file {}.", fileName);

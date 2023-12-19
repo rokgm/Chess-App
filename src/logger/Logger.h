@@ -13,15 +13,10 @@ class Logger
 public:
     /**
      * Create a file logger.
-     *
-     * @param path Path to where the log file is created.
      */
     static void Init();
 
-    static std::shared_ptr<spdlog::logger>& getLogger()
-    {
-        return s_logger;
-    }
+    static std::shared_ptr<spdlog::logger>& getLogger();
 
 private:
     inline static std::shared_ptr<spdlog::logger> s_logger = nullptr;

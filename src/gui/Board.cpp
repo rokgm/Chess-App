@@ -37,6 +37,7 @@ Board::Board(unsigned int boardSize) : m_boardSize(boardSize)
 {
     if (!m_boardTexture.create(m_boardSize, m_boardSize)) {
         CHESS_LOG_ERROR("Board texture could not be created.");
+        throw std::runtime_error("Board texture could not be created.");
     }
     m_boardTexture.clear();
     generateBoardFields(m_boardTexture, static_cast<float>(boardSize) / 8);

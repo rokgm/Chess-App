@@ -6,6 +6,7 @@
     - **MSVC** (Microsoft Visual Studio 2022),
     - **g++** with C++ 17  support. **WIP** (should work, but was not checked for most recent verison).
 - SFML, spdlog and SFML's Linux dependencies are automatically installed with this CMake configuration.
+- If SFML's Linux dependencies aren't installed automatically, run `install_SFML_linux_dependencies.sh` manually. If there is a problem with `ft2build.h`, include directory `/usr/include/freetype` or `/usr/include/freetype2`.
 
 
 ## Developing on Windows
