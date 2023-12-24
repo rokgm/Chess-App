@@ -15,17 +15,13 @@ void generateBoardFields(sf::RenderTexture& board, float fieldSize)
         sf::RectangleShape newField(sf::Vector2f(fieldSize, fieldSize));
         newField.setPosition(rowIndex * fieldSize, columnIndex * fieldSize);
 
-        switch ((rowIndex + columnIndex) % 2) {
-        case 0:
+        if ((rowIndex + columnIndex) % 2 == 0) {
             // Set light brown color.
             newField.setFillColor(sf::Color(254, 231, 193, 255));
-            break;
-        case 1:
+        } 
+        else {
             // Set dark brown color.
             newField.setFillColor(sf::Color(150, 77, 34, 255));
-            break;
-        default:
-            break;
         }
         board.draw(newField);
     }
