@@ -18,8 +18,6 @@ else()
     message(FATAL_ERROR "Compiler not supported for this project.")
 endif()
 
-add_subdirectory(src)
-
 # Install SFML's Linux Dependencies
 if(UNIX AND NOT APPLE)
     execute_process (
@@ -39,10 +37,19 @@ FetchContent_Declare(spdlog
     GIT_REPOSITORY https://github.com/gabime/spdlog.git
     GIT_TAG v1.12.0
 )
-FetchContent_MakeAvailable(SFML spdlog)
+FetchContent_Declare(GTest
+    GIT_REPOSITORY https://github.com/google/googletest
+    GIT_TAG v1.14.x
+)
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(SFML spdlog GTest)
 
 # PROJECT CHESS-AI
-add_executable(${PROJECT_NAME} WIN32 src/main.cpp)
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_executable(${PROJECT_NAME} src/main.cpp)
+else()
+    add_executable(${PROJECT_NAME} WIN32 src/main.cpp)
+endif()
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
@@ -63,14 +70,21 @@ target_precompile_headers(${PROJECT_NAME}
     [["logger/Logger.h"]]
 )
 
-# SFML needs this
-if(WIN32)
-    add_custom_command(
-        TARGET ${PROJECT_NAME}
-        COMMENT "Copy OpenAL DLL"
-        PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${SFML_SOURCE_DIR}/extlibs/bin/$<IF:$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>,x64,x86>/openal32.dll $<TARGET_FILE_DIR:${PROJECT_NAME}>
-        VERBATIM)
-endif()
+# SFML needs this for audio
+# if(WIN32)
+#     add_custom_command(
+#         TARGET ${PROJECT_NAME}
+#         COMMENT "Copy OpenAL DLL"
+#         PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${SFML_SOURCE_DIR}/extlibs/bin/$<IF:$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>,x64,x86>/openal32.dll $<TARGET_FILE_DIR:${PROJECT_NAME}>
+#         VERBATIM)
+# endif()
 
 # Copy chess pieces images to binary dir.
 file(COPY pieces_images DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+file(COPY fonts DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+
+enable_testing()
+include(CTest)
+
+add_subdirectory(src)
+add_subdirectory(test)

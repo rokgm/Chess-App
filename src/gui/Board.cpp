@@ -18,11 +18,12 @@ void generateBoardFields(sf::RenderTexture& board, float fieldSize)
         if ((rowIndex + columnIndex) % 2 == 0) {
             // Set light brown color.
             newField.setFillColor(sf::Color(254, 231, 193, 255));
-        } 
+        }
         else {
             // Set dark brown color.
             newField.setFillColor(sf::Color(150, 77, 34, 255));
         }
+
         board.draw(newField);
     }
 }
@@ -32,7 +33,6 @@ void generateBoardFields(sf::RenderTexture& board, float fieldSize)
 Board::Board(unsigned int boardSize) : m_boardSize(boardSize)
 {
     if (!m_boardTexture.create(m_boardSize, m_boardSize)) {
-        CHESS_LOG_ERROR("Board texture could not be created.");
         throw std::runtime_error("Board texture could not be created.");
     }
     m_boardTexture.clear();
