@@ -1,10 +1,10 @@
-add_library(gui Board.cpp Board.h Game.cpp Game.h)
+add_library(gui Board.cpp Board.h Game.cpp Game.h GameMenu.cpp GameMenu.h)
 
 target_link_libraries(gui
     PRIVATE
     sfml-graphics
     logger
-    logic
+    core
 )
 
 target_include_directories(gui

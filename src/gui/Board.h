@@ -5,6 +5,8 @@
 namespace chessAi
 {
 
+enum class PieceColor;
+
 class Board
 {
 public:
