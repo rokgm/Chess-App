@@ -1,5 +1,7 @@
 #pragma once
 
+#define _SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING
+
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/spdlog.h>
 

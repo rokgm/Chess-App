@@ -45,22 +45,53 @@ std::map<PieceType, sf::Texture> getPieceTextures()
     return textures;
 }
 
-unsigned int getSmallestNumber(unsigned int x, unsigned int y)
+bool pressedInSquare(const sf::Event::MouseButtonEvent& mouse, const sf::FloatRect& bounds)
 {
-    return (x < y) ? x : y;
+    return bounds.left < static_cast<float>(mouse.x) &&
+           static_cast<float>(mouse.x) < bounds.left + bounds.width &&
+           bounds.top < static_cast<float>(mouse.y) &&
+           static_cast<float>(mouse.y) < bounds.top + bounds.height;
+}
+
+bool touchedInSquare(const sf::Event::MouseMoveEvent& mouse, const sf::FloatRect& bounds)
+{
+    return bounds.left < static_cast<float>(mouse.x) &&
+           static_cast<float>(mouse.x) < bounds.left + bounds.width &&
+           bounds.top < static_cast<float>(mouse.y) &&
+           static_cast<float>(mouse.y) < bounds.top + bounds.height;
+}
+
+bool touchedInSquare(const sf::Event::MouseWheelScrollEvent& mouse, const sf::FloatRect& bounds)
+{
+    return bounds.left < static_cast<float>(mouse.x) &&
+           static_cast<float>(mouse.x) < bounds.left + bounds.width &&
+           bounds.top < static_cast<float>(mouse.y) &&
+           static_cast<float>(mouse.y) < bounds.top + bounds.height;
+}
+
+unsigned int countNumberOfOccurrences(const std::string& s, char c)
+{
+    unsigned int occurrence = 0;
+    for (unsigned long i = 0; i < s.length(); i++)
+        if (s[i] == c)
+            occurrence++;
+    return occurrence;
 }
 
 } // namespace
 
 Game::Game(sf::RenderWindow* window, PieceColor color, bool againstComputer,
-           const std::string& fenString)
-    : m_window(window),
-      m_board(getSmallestNumber(m_window->getSize().x, m_window->getSize().y) * 4 / 5),
+           const std::chrono::milliseconds& timeLimit, const std::string& fenString)
+    : m_window(window), m_board(std::min(m_window->getSize().x, m_window->getSize().y) * 4 / 5),
       m_pieceTextures(getPieceTextures()), m_selectedPiecePosition(std::nullopt),
       m_selectedPawnPromotion(std::nullopt), m_promotionDrawn(std::nullopt), m_playerColor(color),
       m_boardState(fenString), m_font(), m_instructions(), m_endOfGameText(),
-      m_engine(std::chrono::milliseconds(3000)), m_againstComputer(againstComputer),
-      m_engineThread(), m_engineIsRunning(false), m_runGame(true)
+      m_showGameHistoryText(), m_whiteMovesText(), m_blackMovesText(), m_gameHistoryWhiteText(),
+      m_gameHistoryBlackText(), m_gameHistoryBackground(), m_gameHistoryView(),
+      m_engine(true, timeLimit), m_againstComputer(againstComputer), m_engineThread(),
+      m_engineIsRunning(false), m_runGame(true), m_showGameHistory(false), m_mouseScrolled(0),
+      m_figureNotation({'\0', 'B', 'N', 'R', 'K', 'Q'}), m_whiteMovesString(""),
+      m_blackMovesString("")
 {
     m_board.setCenterPosition(m_window->getSize());
 
@@ -69,21 +100,42 @@ Game::Game(sf::RenderWindow* window, PieceColor color, bool againstComputer,
     }
 
     m_instructions.setFont(m_font);
-    m_instructions.setString(
-        "Use left arrow to go to previous positions.\nUse escape to go to menu.");
+    m_instructions.setString("Press left arrow to undo moves\nPress escape to go to main menu");
     m_instructions.setFillColor(sf::Color::White);
 
     m_endOfGameText.setFont(m_font);
     m_endOfGameText.setFillColor(sf::Color::White);
     m_endOfGameText.setOutlineColor(sf::Color::Black);
     m_endOfGameText.setOutlineThickness(10.f);
+
+    m_showGameHistoryText.setFont(m_font);
+    m_showGameHistoryText.setString("Show game history");
+    m_showGameHistoryText.setFillColor(sf::Color::White);
+
+    m_whiteMovesText.setFont(m_font);
+    m_whiteMovesText.setString("White");
+    m_whiteMovesText.setFillColor(sf::Color::White);
+
+    m_blackMovesText.setFont(m_font);
+    m_blackMovesText.setString("Black");
+    m_blackMovesText.setFillColor(sf::Color::White);
+
+    m_gameHistoryWhiteText.setFont(m_font);
+    m_gameHistoryWhiteText.setFillColor(sf::Color::White);
+
+    m_gameHistoryBlackText.setFont(m_font);
+    m_gameHistoryBlackText.setFillColor(sf::Color::White);
+
+    m_gameHistoryBackground.setFillColor(sf::Color(50, 50, 50, 255));
 }
 
 void Game::handleWindowResize(const sf::Event& event)
 {
     m_window->setView(sf::View(sf::FloatRect(0, 0, static_cast<float>(event.size.width),
                                              static_cast<float>(event.size.height))));
-    m_board.resize(getSmallestNumber(event.size.width, event.size.height) * 4 / 5);
+    m_board.resize(
+        std::min(static_cast<float>(event.size.width), static_cast<float>(event.size.height)) * 4 /
+        5);
     m_board.setCenterPosition(sf::Vector2u(event.size.width, event.size.height));
 }
 
@@ -117,8 +169,19 @@ void Game::handleMousePressed(const sf::Event& event)
     if (!determineMousePressedOnBoard(event.mouseButton.x, event.mouseButton.y)) {
         CHESS_LOG_TRACE("Mouse not pressed on board.");
         m_selectedPiecePosition = std::nullopt;
+        if (pressedInSquare(event.mouseButton, m_showGameHistoryText.getGlobalBounds())) {
+            m_showGameHistory = !m_showGameHistory;
+            if (m_showGameHistory)
+                m_showGameHistoryText.setStyle(sf::Text::Underlined);
+            else
+                m_showGameHistoryText.setStyle(sf::Text::Regular);
+        }
         return;
     }
+
+    if (m_engineIsRunning || !m_endOfGameText.getString().isEmpty())
+        return;
+
     auto [positionX, positionY] =
         calculatePositionOnBoard(event.mouseButton.x, event.mouseButton.y);
     CHESS_LOG_TRACE("positionX: {}, positionY: {}", positionX, positionY);
@@ -264,16 +327,35 @@ void Game::handleEvents()
             handleWindowResize(event);
             break;
         case sf::Event::MouseButtonPressed:
-            if (m_engineIsRunning)
-                break;
-            if (m_endOfGameText.getString().isEmpty())
-                handleMousePressed(event);
+            handleMousePressed(event);
+            break;
+        case sf::Event::MouseMoved:
+            if (!m_showGameHistory) {
+                if (touchedInSquare(event.mouseMove, m_showGameHistoryText.getGlobalBounds()))
+                    m_showGameHistoryText.setStyle(sf::Text::Underlined);
+                else
+                    m_showGameHistoryText.setStyle(sf::Text::Regular);
+            }
+            break;
+        case sf::Event::MouseWheelScrolled:
+            if (m_showGameHistory) {
+                if (touchedInSquare(event.mouseWheelScroll,
+                                    m_gameHistoryBackground.getGlobalBounds())) {
+                    if (m_gameHistoryWhiteText.getGlobalBounds().height >
+                        m_gameHistoryBackground.getGlobalBounds().height) {
+                        // "-" because we want to move down if you scroll down
+                        m_mouseScrolled -= static_cast<int>(event.mouseWheelScroll.delta);
+                    }
+                }
+            }
             break;
         case sf::Event::KeyPressed:
             if (m_engineIsRunning)
                 break;
             if (event.key.scancode == sf::Keyboard::Scan::Left) {
                 CHESS_LOG_TRACE("Left arrow pressed.");
+                m_whiteMovesString = "";
+                m_blackMovesString = "";
                 m_boardState.goToPreviousBoardState();
                 // If against computer, previous computer move must also be skipped.
                 if (m_againstComputer)
@@ -362,7 +444,7 @@ void Game::drawPieceType(const PieceType& type, unsigned int position,
     m_window->draw(pieceSprite);
 }
 
-void Game::drawPieceOnPositions(const PieceType& type, const std::vector<unsigned int>& positions,
+void Game::drawPieceOnPositions(const PieceType& type, const std::vector<uint16_t>& positions,
                                 const sf::FloatRect& boardGlobalBounds)
 {
     auto boardFieldSize = boardGlobalBounds.width / 8;
@@ -386,55 +468,10 @@ void Game::highlightLegalMoves(unsigned int position)
     auto piece = m_boardState.getPiece(position);
     switch (piece.getPieceColor()) {
     case PieceColor::White:
-        switch (piece.getPieceFigure()) {
-        case PieceFigure::Pawn:
-            drawMoveDestinationHighlights<PieceColor::White, PieceFigure::Pawn>(position);
-            break;
-        case PieceFigure::Bishop:
-            drawMoveDestinationHighlights<PieceColor::White, PieceFigure::Bishop>(position);
-            break;
-        case PieceFigure::Rook:
-            drawMoveDestinationHighlights<PieceColor::White, PieceFigure::Rook>(position);
-            break;
-        case PieceFigure::Knight:
-            drawMoveDestinationHighlights<PieceColor::White, PieceFigure::Knight>(position);
-            break;
-        case PieceFigure::King:
-            drawMoveDestinationHighlights<PieceColor::White, PieceFigure::King>(position);
-            break;
-        case PieceFigure::Queen:
-            drawMoveDestinationHighlights<PieceColor::White, PieceFigure::Queen>(position);
-            break;
-        default:
-            CHESS_LOG_ERROR("Unhandled piece figure.");
-            break;
-        }
+        drawMoveDestinationHighlights<PieceColor::White>(position, piece.getPieceFigure());
         break;
     case PieceColor::Black:
-        switch (piece.getPieceFigure()) {
-        case PieceFigure::Pawn:
-            drawMoveDestinationHighlights<PieceColor::Black, PieceFigure::Pawn>(position);
-            break;
-        case PieceFigure::Bishop:
-            drawMoveDestinationHighlights<PieceColor::Black, PieceFigure::Bishop>(position);
-            break;
-        case PieceFigure::Rook:
-            drawMoveDestinationHighlights<PieceColor::Black, PieceFigure::Rook>(position);
-            break;
-        case PieceFigure::Knight:
-            drawMoveDestinationHighlights<PieceColor::Black, PieceFigure::Knight>(position);
-
-            break;
-        case PieceFigure::King:
-            drawMoveDestinationHighlights<PieceColor::Black, PieceFigure::King>(position);
-            break;
-        case PieceFigure::Queen:
-            drawMoveDestinationHighlights<PieceColor::Black, PieceFigure::Queen>(position);
-            break;
-        default:
-            CHESS_LOG_ERROR("Unhandled piece figure.");
-            break;
-        }
+        drawMoveDestinationHighlights<PieceColor::Black>(position, piece.getPieceFigure());
         break;
     default:
         CHESS_LOG_ERROR("Unhandled piece color.");
@@ -463,8 +500,7 @@ void Game::drawInstructions()
     auto boardBounds = m_board.getBoardSprite().getGlobalBounds();
     m_instructions.setPosition(boardBounds.left, boardBounds.top + boardBounds.height);
     m_instructions.setCharacterSize(static_cast<unsigned int>(
-        0.03f *
-        static_cast<float>(getSmallestNumber(m_window->getSize().x, m_window->getSize().y))));
+        0.03f * static_cast<float>(std::min(m_window->getSize().x, m_window->getSize().y))));
     m_window->draw(m_instructions);
 }
 
@@ -474,8 +510,7 @@ void Game::drawGameOver()
         m_endOfGameText.setOrigin(0.5f * m_endOfGameText.getLocalBounds().getSize());
         m_endOfGameText.setPosition(0.5f * static_cast<sf::Vector2f>(m_window->getSize()));
         m_endOfGameText.setCharacterSize(static_cast<unsigned int>(
-            0.2f *
-            static_cast<float>(getSmallestNumber(m_window->getSize().x, m_window->getSize().y))));
+            0.2f * static_cast<float>(std::min(m_window->getSize().x, m_window->getSize().y))));
         m_window->draw(m_endOfGameText);
     }
 }
@@ -488,6 +523,260 @@ void Game::drawPromotion()
         unsigned int positionX = position % 8;
         unsigned int positionY = position / 8;
         drawPromotion(m_promotionDrawn->second, positionX, positionY);
+    }
+}
+
+bool Game::findPieceCapturedNotation(const PieceBitBoards& bitBoards, uint16_t destination)
+{
+    bool figureWasCaptured = false;
+    for (const auto& [pieceType, bitBoard] : bitBoards.getTypeToPieceBitBoards()) {
+        if (PieceBitBoards::getBit(*bitBoard, destination) == 1) {
+            figureWasCaptured = true;
+            break;
+        }
+    }
+    return figureWasCaptured;
+}
+
+char Game::findPieceNotation(const PieceBitBoards& bitBoards, uint16_t destination)
+{
+    char selectedPieceNotation = '\0';
+    for (const auto& [pieceType, bitBoard] : bitBoards.getTypeToPieceBitBoards()) {
+        if (PieceBitBoards::getBit(*bitBoard, destination) == 1) {
+            if (pieceType.getPieceFigure() != PieceFigure::Empty) {
+                selectedPieceNotation =
+                    m_figureNotation.at(static_cast<size_t>(pieceType.getPieceFigure()) - 1);
+                break;
+            }
+        }
+    }
+    return selectedPieceNotation;
+}
+
+std::string Game::getWholeMoveString(Move move, bool figureWasCaptured, char selectedPieceNotation)
+{
+    std::string executedMove = "";
+    char originLetter = static_cast<char>(move.origin % 8 - 0 + 'a');
+    char destinationLetter = static_cast<char>(move.destination % 8 - 0 + 'a');
+    char destinationNumber = static_cast<char>(8 - move.destination / 8 + '0');
+
+    if (figureWasCaptured) {
+        switch (move.specialMoveFlag) {
+        case 0:
+            // Empty char is displayed as a tiny dot so that is why we check if the selected
+            // piece was a pawn ('\0' present a pawn)
+            if (selectedPieceNotation != '\0') {
+                executedMove += selectedPieceNotation;
+            }
+            else {
+                executedMove += originLetter;
+            }
+            executedMove += 'x';
+            executedMove += destinationLetter;
+            executedMove += destinationNumber;
+            break;
+        case 1:
+            executedMove += originLetter;
+            executedMove += 'x';
+            executedMove += destinationLetter;
+            executedMove += destinationNumber;
+            if (move.promotion == 0)
+                executedMove += "=N";
+            else if (move.promotion == 1)
+                executedMove += "=B";
+            else if (move.promotion == 2)
+                executedMove += "=R";
+            else
+                executedMove += "=Q";
+            break;
+        default:
+            break;
+        }
+    }
+    else {
+        switch (move.specialMoveFlag) {
+        case 0:
+            if (selectedPieceNotation != '\0') {
+                executedMove += selectedPieceNotation;
+            }
+            executedMove += destinationLetter;
+            executedMove += destinationNumber;
+            break;
+        case 1:
+            executedMove += destinationLetter;
+            executedMove += destinationNumber;
+            if (move.promotion == 0)
+                executedMove += "=N";
+            else if (move.promotion == 1)
+                executedMove += "=B";
+            else if (move.promotion == 2)
+                executedMove += "=R";
+            else
+                executedMove += "=Q";
+            break;
+        case 2:
+            // En passant is in non-capture branch because a figure is only captured if the
+            // current
+            // move destination coincides with the figure's position in the previous board state
+            executedMove += originLetter;
+            executedMove += 'x';
+            executedMove += destinationLetter;
+            executedMove += destinationNumber;
+            break;
+        case 3:
+            if (move.origin - move.destination < 0)
+                executedMove += "0-0";
+            else
+                executedMove += "0-0-0";
+        default:
+            break;
+        }
+    }
+    return executedMove;
+}
+
+void Game::findAlgebraicNotation()
+{
+    // \n is an escape sequence for a line feed (in the decimal code it is 10)
+    if (((countNumberOfOccurrences(m_whiteMovesString, 10) +
+          countNumberOfOccurrences(m_blackMovesString, 10)) !=
+         static_cast<unsigned int>(m_boardState.getMovesHistory().size()))) {
+        m_whiteMovesString = "";
+        m_blackMovesString = "";
+        for (size_t moveAndBoard = 0; moveAndBoard < m_boardState.getMovesHistory().size();
+             moveAndBoard++) {
+            const Move move = m_boardState.getMovesHistory().at(moveAndBoard);
+            bool figureWasCaptured = findPieceCapturedNotation(
+                m_boardState.getBitBoardsHistory().at(moveAndBoard), move.destination);
+            char selectedPieceNotation = findPieceNotation(
+                m_boardState.getBitBoardsHistory().at(moveAndBoard + 1), move.destination);
+
+            std::string executedMove =
+                getWholeMoveString(move, figureWasCaptured, selectedPieceNotation);
+
+            if (moveAndBoard % 2 == 0) {
+                m_whiteMovesString += executedMove;
+                if (MoveGenerator<PieceColor::Black>::isKingInCheck(
+                        m_boardState.getBitBoardsHistory().at(moveAndBoard + 1)))
+                    m_whiteMovesString += "+";
+                m_whiteMovesString += "\n";
+            }
+            else {
+                m_blackMovesString += executedMove;
+                if (MoveGenerator<PieceColor::White>::isKingInCheck(
+                        m_boardState.getBitBoardsHistory().at(moveAndBoard + 1)))
+                    m_blackMovesString += "+";
+                m_blackMovesString += "\n";
+            }
+        }
+    }
+}
+
+void Game::drawGameHistoryBackground(sf::FloatRect& boardBounds)
+{
+    m_gameHistoryBackground.setSize(sf::Vector2f(boardBounds.width / 8 * 2, boardBounds.height));
+    m_gameHistoryBackground.setPosition(
+        boardBounds.left + boardBounds.width + boardBounds.width / 16, boardBounds.top);
+
+    m_whiteMovesText.setPosition(m_gameHistoryBackground.getGlobalBounds().left,
+                                 m_gameHistoryBackground.getGlobalBounds().top -
+                                     1.5f * m_showGameHistoryText.getGlobalBounds().height);
+    m_whiteMovesText.setCharacterSize(static_cast<unsigned int>(
+        0.03f * static_cast<float>(std::min(m_window->getSize().x, m_window->getSize().y))));
+    m_blackMovesText.setPosition(m_gameHistoryBackground.getGlobalBounds().left +
+                                     m_gameHistoryBackground.getGlobalBounds().width -
+                                     m_whiteMovesText.getGlobalBounds().width,
+                                 m_gameHistoryBackground.getGlobalBounds().top -
+                                     1.5f * m_showGameHistoryText.getGlobalBounds().height);
+    m_blackMovesText.setCharacterSize(static_cast<unsigned int>(
+        0.03f * static_cast<float>(std::min(m_window->getSize().x, m_window->getSize().y))));
+
+    m_window->draw(m_gameHistoryBackground);
+    m_window->draw(m_whiteMovesText);
+    m_window->draw(m_blackMovesText);
+}
+
+void Game::drawGameHistoryMoves()
+{
+    findAlgebraicNotation();
+    // White moves history
+    m_gameHistoryWhiteText.setString(m_whiteMovesString);
+    m_gameHistoryWhiteText.setPosition(m_gameHistoryBackground.getGlobalBounds().left +
+                                           0.1f * m_whiteMovesText.getGlobalBounds().width,
+                                       m_gameHistoryBackground.getGlobalBounds().top);
+    m_gameHistoryWhiteText.setCharacterSize(static_cast<unsigned int>(
+        0.0224f * static_cast<float>(std::min(m_window->getSize().x, m_window->getSize().y))));
+    m_window->draw(m_gameHistoryWhiteText);
+
+    // Black moves history
+    m_gameHistoryBlackText.setString(m_blackMovesString);
+    m_gameHistoryBlackText.setPosition(m_gameHistoryBackground.getGlobalBounds().left +
+                                           m_gameHistoryBackground.getGlobalBounds().width -
+                                           1.0f * m_blackMovesText.getGlobalBounds().width,
+                                       m_gameHistoryBackground.getGlobalBounds().top);
+    m_gameHistoryBlackText.setCharacterSize(static_cast<unsigned int>(
+        0.0224f * static_cast<float>(std::min(m_window->getSize().x, m_window->getSize().y))));
+    m_window->draw(m_gameHistoryBlackText);
+}
+
+void Game::setGameHistoryView(sf::RectangleShape& gameHistoryBackground)
+{
+    m_gameHistoryView.reset(gameHistoryBackground.getGlobalBounds());
+    m_gameHistoryView.setViewport(sf::FloatRect(
+        gameHistoryBackground.getGlobalBounds().left / static_cast<float>(m_window->getSize().x),
+        gameHistoryBackground.getGlobalBounds().top / static_cast<float>(m_window->getSize().y),
+        gameHistoryBackground.getGlobalBounds().width / static_cast<float>(m_window->getSize().x),
+        gameHistoryBackground.getGlobalBounds().height /
+            static_cast<float>(m_window->getSize().y)));
+    if (m_gameHistoryWhiteText.getGlobalBounds().height >
+        gameHistoryBackground.getGlobalBounds().height) {
+        if (m_mouseScrolled < 0)
+            m_mouseScrolled = 0;
+        else if (gameHistoryBackground.getGlobalBounds().height +
+                     static_cast<float>(m_mouseScrolled) * 10.f >
+                 m_gameHistoryWhiteText.getGlobalBounds().height)
+            m_mouseScrolled = static_cast<int>((m_gameHistoryWhiteText.getGlobalBounds().height -
+                                                gameHistoryBackground.getGlobalBounds().height) *
+                                               0.1f);
+        m_gameHistoryView.move(0.f, static_cast<float>(m_mouseScrolled) * 10.f);
+    }
+}
+
+void Game::drawGameHistory()
+{
+    auto boardBounds = m_board.getBoardSprite().getGlobalBounds();
+    auto squareWidth = boardBounds.width / 8.f;
+    m_showGameHistoryText.setPosition(
+        boardBounds.left + boardBounds.width - m_showGameHistoryText.getLocalBounds().width,
+        boardBounds.top - 1.5f * m_showGameHistoryText.getLocalBounds().height);
+    m_showGameHistoryText.setCharacterSize(static_cast<unsigned int>(
+        0.03f * static_cast<float>(std::min(m_window->getSize().x, m_window->getSize().y))));
+    m_window->draw(m_showGameHistoryText);
+
+    if (m_showGameHistory) {
+        // Resizing the board based on the size of the game history width
+        if (((static_cast<float>(m_window->getSize().x) - boardBounds.width) / 2.f) <
+            squareWidth * 3.f) {
+            m_board.resize(
+                std::min((static_cast<float>(m_window->getSize().x) - squareWidth * 2.f) * 0.9f,
+                         static_cast<float>(m_window->getSize().y)) *
+                4 / 5);
+        }
+        sf::View originalView = m_window->getView();
+
+        drawGameHistoryBackground(boardBounds);
+        setGameHistoryView(m_gameHistoryBackground);
+
+        m_window->setView(m_gameHistoryView);
+
+        drawGameHistoryMoves();
+
+        m_window->setView(originalView);
+    }
+    else {
+        m_board.resize(std::min(static_cast<float>(m_window->getSize().x),
+                                static_cast<float>(m_window->getSize().y)) *
+                       4 / 5);
     }
 }
 
@@ -504,13 +793,14 @@ void Game::displayGameSprites()
     }
     auto move = m_boardState.getLastMove();
     if (move.has_value()) {
-        m_window->draw(getBoardFieldHighlight(move->origin));
-        m_window->draw(getBoardFieldHighlight(move->destination));
+        m_window->draw(getBoardFieldHighlight(move->origin, sf::Color(255, 205, 100, 120)));
+        m_window->draw(getBoardFieldHighlight(move->destination, sf::Color(255, 205, 100, 120)));
     }
     highlightKingInCheck();
     drawPosition();
     drawInstructions();
     drawPromotion();
+    drawGameHistory();
     drawGameOver();
 
     m_window->display();
@@ -520,8 +810,10 @@ void Game::runEngine()
 {
     m_engineIsRunning = true;
 
-    auto [move, depth] = m_engine.findBestMove(m_boardState.getBitBoards());
-    CHESS_LOG_INFO("Depth to which the engine searched is {}", depth);
+    auto [move, depth] =
+        m_engine.findBestMove(m_boardState.getBitBoards(), m_boardState.getZobristKeyHistory(),
+                              m_boardState.getMovesHistory());
+    CHESS_LOG_INFO("Depth to which the engine searched is {}\n", depth);
     if (move.has_value()) {
         auto endOfGame = m_boardState.updateBoardState(*move);
 

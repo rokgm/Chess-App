@@ -6,7 +6,7 @@
 namespace chessAi
 {
 
-uint64_t King::generateOneAttack(unsigned int origin)
+uint64_t King::generateOneAttack(uint16_t origin)
 {
     uint64_t attack = 0;
     if (origin / 8 < 7)
@@ -33,7 +33,7 @@ uint64_t King::generateOneAttack(unsigned int origin)
 std::array<uint64_t, 64> King::generateAttacks()
 {
     std::array<uint64_t, 64> attacks{};
-    for (unsigned int i = 0; i < 64; ++i) {
+    for (uint16_t i = 0; i < 64; ++i) {
         attacks[i] = generateOneAttack(i);
     }
     return attacks;

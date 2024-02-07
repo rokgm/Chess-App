@@ -7,7 +7,7 @@ namespace chessAi
 
 EndOfGameType EndOfGameChecker::checkBoardState(const PieceBitBoards& bitBoards)
 {
-    bool allEmpty = MoveGeneratorWrapper::generateLegalMoves(bitBoards).empty();
+    bool allEmpty = MoveGeneratorWrapper::generateLegalMoves<MoveType::Normal>(bitBoards).empty();
     bool kingIsInCheck = false;
 
     if (bitBoards.currentMoveColor == PieceColor::White) {

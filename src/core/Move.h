@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 namespace chessAi
 {
 
@@ -28,8 +30,7 @@ struct Move
 
 /**
  * Use for unary comparison, as in std::find_if for example. Compares only origin and destination
- * of move. If promotion flag is set (for any move), compares also type of promotion and special
- * flags.
+ * of move. If promotion flag is set, compares also type of promotion.
  */
 struct SpecialMoveCompare
 {

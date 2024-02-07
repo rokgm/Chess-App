@@ -10,6 +10,7 @@ add_test(NAME performance_tests COMMAND performance_tests)
 add_compile_definitions(
     $<$<CONFIG:Debug>:DEBUG>
     $<$<CONFIG:Release>:RELEASE>
+    $<$<CONFIG:RelWithDebInfo>:DEBUG>
 )
 
 # Add perft test positions to binary

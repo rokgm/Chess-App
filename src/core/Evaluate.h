@@ -17,10 +17,6 @@ public:
     /**
      * Return evaluation of the position from the perspective of the current color as needed for
      * negamax.
-     *
-     * TODO: Store piece positions in board, so no need to iterate over get set bit positions here
-     * and elsewhere. Check everywhere where get set bit positions is called.
-     * (Maybe) Store material score and update in apply move.
      */
     static int getEvaluation(const PieceBitBoards& boards);
 
@@ -30,6 +26,9 @@ private:
     static float endgameWeight(const PieceBitBoards& boards);
     static int pieceSquareTableEvaluation(const PieceBitBoards& boards);
     static int mopUpEvaluation(const PieceBitBoards& boards);
+    static int kingPawnShield(const PieceBitBoards& boards);
+
+    static std::array<std::array<int, 64>, 64> precalculateManhattanDistance();
 
 private:
     inline static float s_endgameWeight = 0.f;
@@ -42,7 +41,7 @@ private:
 
     // clang-format off
     // Orientated with white at the bottom.
-    inline static const std::array<int, 64> pawnSquareValues = {
+    inline static const std::array<int, 64> s_pawnSquareValues = {
          0,  0,  0,  0,  0,  0,  0,  0,
         50, 50, 50, 50, 50, 50, 50, 50,
         10, 10, 20, 30, 30, 20, 10, 10,
@@ -52,7 +51,7 @@ private:
          5, 10, 10,-20,-20, 10, 10,  5,
          0,  0,  0,  0,  0,  0,  0,  0
     };
-    inline static const std::array<int, 64> knightSquareValues = {
+    inline static const std::array<int, 64> s_knightSquareValues = {
         -50,-40,-30,-30,-30,-30,-40,-50,
         -40,-20,  0,  0,  0,  0,-20,-40,
         -30,  0, 10, 15, 15, 10,  0,-30,
@@ -62,7 +61,7 @@ private:
         -40,-20,  0,  5,  5,  0,-20,-40,
         -50,-40,-30,-30,-30,-30,-40,-50
     };
-    inline static const std::array<int, 64> bishopSquareValues = {
+    inline static const std::array<int, 64> s_bishopSquareValues = {
         -50,-40,-30,-30,-30,-30,-40,-50,
         -40,-20,  0,  0,  0,  0,-20,-40,
         -30,  0, 10, 15, 15, 10,  0,-30,
@@ -72,7 +71,7 @@ private:
         -40,-20,  0,  5,  5,  0,-20,-40,
         -50,-40,-30,-30,-30,-30,-40,-50
     };
-    inline static const std::array<int, 64> rookSquareValues = {
+    inline static const std::array<int, 64> s_rookSquareValues = {
         0,  0,  0,  0,  0,  0,  0,  0,
          5, 10, 10, 10, 10, 10, 10,  5,
         -5,  0,  0,  0,  0,  0,  0, -5,
@@ -82,7 +81,7 @@ private:
         -5,  0,  0,  0,  0,  0,  0, -5,
          0,  0,  0,  5,  5,  0,  0,  0
     };
-    inline static const std::array<int, 64> queenSquareValues = {
+    inline static const std::array<int, 64> s_queenSquareValues = {
         -20,-10,-10, -5, -5,-10,-10,-20,
         -10,  0,  0,  0,  0,  0,  0,-10,
         -10,  0,  5,  5,  5,  5,  0,-10,
@@ -92,7 +91,7 @@ private:
         -10,  0,  5,  0,  0,  0,  0,-10,
         -20,-10,-10, -5, -5,-10,-10,-20
     };
-    inline static const std::array<int, 64> kingMiddleGameSquareValues = {
+    inline static const std::array<int, 64> s_kingMiddleGameSquareValues = {
         -30,-40,-40,-50,-50,-40,-40,-30,
         -30,-40,-40,-50,-50,-40,-40,-30,
         -30,-40,-40,-50,-50,-40,-40,-30,
@@ -102,7 +101,7 @@ private:
          20, 20,  0,  0,  0,  0, 20, 20,
          20, 30, 10,  0,  0, 10, 30, 20
     };
-    inline static const std::array<int, 64> kingEndGameSquareValues = {
+    inline static const std::array<int, 64> s_kingEndGameSquareValues = {
         -50,-40,-30,-20,-20,-30,-40,-50,
         -30,-20,-10,  0,  0,-10,-20,-30,
         -30,-10, 20, 30, 30, 20,-10,-30,
@@ -113,7 +112,8 @@ private:
         -50,-30,-30,-30,-30,-30,-30,-50
     };
 
-    inline static const std::array<int, 64> centerManhattanDistance = {
+    // Distance from the center.
+    inline static const std::array<int, 64> s_centerManhattanDistance = {
         6, 5, 4, 3, 3, 4, 5, 6,
         5, 4, 3, 2, 2, 3, 4, 5,
         4, 3, 2, 1, 1, 2, 3, 4,
@@ -124,6 +124,10 @@ private:
         6, 5, 4, 3, 3, 4, 5, 6
     };
     // clang-format on
+
+    // Precalculated distance between two pieces.
+    inline static const std::array<std::array<int, 64>, 64> s_manhattanDistance =
+        precalculateManhattanDistance();
 };
 
 } // namespace chessAi

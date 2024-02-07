@@ -10,7 +10,7 @@ class King
 private:
     static std::array<uint64_t, 64> generateAttacks();
 
-    static uint64_t generateOneAttack(unsigned int origin);
+    static uint64_t generateOneAttack(uint16_t origin);
 
 public:
     /**

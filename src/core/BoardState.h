@@ -24,8 +24,16 @@ public:
     void goToPreviousBoardState();
 
     const PieceBitBoards& getBitBoards() const;
+
     PieceType getPiece(unsigned int position) const;
+
     std::optional<Move> getLastMove() const;
+
+    std::vector<uint64_t> getZobristKeyHistory() const;
+
+    const std::vector<Move>& getMovesHistory() const;
+
+    const std::vector<PieceBitBoards>& getBitBoardsHistory() const;
 
 private:
     PieceBitBoards m_bitBoards;
