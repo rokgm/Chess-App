@@ -5,6 +5,7 @@
 #include "logger/Logger.h"
 
 #include <map>
+#include <set>
 #include <string>
 
 namespace chessAi
@@ -47,6 +48,22 @@ struct PieceBitBoards
 
     uint64_t zobristKey = 0;
 
+    // Contigious (iterating over this many times). Works faster than set or unordered set,
+    // otherwise set would make more sense.
+    std::vector<uint16_t> whitePawnPositions;
+    std::vector<uint16_t> whiteBishopPositions;
+    std::vector<uint16_t> whiteKnightPositions;
+    std::vector<uint16_t> whiteRookPositions;
+    std::vector<uint16_t> whiteQueenPositions;
+    std::vector<uint16_t> whiteKingPositions;
+
+    std::vector<uint16_t> blackPawnPositions;
+    std::vector<uint16_t> blackBishopPositions;
+    std::vector<uint16_t> blackKnightPositions;
+    std::vector<uint16_t> blackRookPositions;
+    std::vector<uint16_t> blackQueenPositions;
+    std::vector<uint16_t> blackKingPositions;
+
 public:
     /**
      * Apply move to bit boards, update castling rights and updates current move color.
@@ -55,15 +72,15 @@ public:
 
     inline std::map<PieceType, const uint64_t*> getTypeToPieceBitBoards() const;
 
-    inline static void setBit(uint64_t& number, unsigned int index);
+    inline static void setBit(uint64_t& number, uint16_t index);
 
-    inline static bool getBit(uint64_t number, unsigned int index);
+    inline static bool getBit(uint64_t number, uint16_t index);
 
-    inline static void clearBit(uint64_t& number, unsigned int index);
+    inline static void clearBit(uint64_t& number, uint16_t index);
 
-    inline static std::vector<unsigned int> getSetBitPositions(uint64_t number);
+    inline static std::vector<uint16_t> getSetBitPositions(uint64_t number);
 
-    inline static unsigned int countSetBits(uint64_t number);
+    inline static uint16_t countSetBits(uint64_t number);
 
     inline uint64_t getAllPiecesBoard() const;
 
@@ -91,32 +108,38 @@ public:
 private:
     std::pair<uint64_t*, PieceFigure> getBoardWithSetBitAtPosition(uint16_t position,
                                                                    PieceColor color);
+    std::vector<uint16_t>& getPiecePositions(const PieceType& type);
+
     bool parsePosition(const std::string& position);
     bool parseRow(const std::string& row, uint8_t rowIndex);
     bool parseActiveColor(const std::string& activeColor);
     bool parseCastlingRights(const std::string& castlingRights);
     bool parseEnPassant(const std::string& enPassant);
+
+    void handleCastling(PieceFigure figure, Move move);
+    void handleEnPassant(Move move);
+    void handlePromotion(Move move);
 };
 
-inline void PieceBitBoards::setBit(uint64_t& number, unsigned int index)
+inline void PieceBitBoards::setBit(uint64_t& number, uint16_t index)
 {
     number |= (1ULL << index);
 }
 
-inline bool PieceBitBoards::getBit(uint64_t number, unsigned int index)
+inline bool PieceBitBoards::getBit(uint64_t number, uint16_t index)
 {
     return number & (1ULL << index);
 }
 
-inline void PieceBitBoards::clearBit(uint64_t& number, unsigned int index)
+inline void PieceBitBoards::clearBit(uint64_t& number, uint16_t index)
 {
     (number) &= ~(1ULL << index);
 }
 
-inline std::vector<unsigned int> PieceBitBoards::getSetBitPositions(uint64_t number)
+inline std::vector<uint16_t> PieceBitBoards::getSetBitPositions(uint64_t number)
 {
-    std::vector<unsigned int> positions;
-    for (int i = 0; i < 64; ++i) {
+    std::vector<uint16_t> positions;
+    for (uint16_t i = 0; i < 64; ++i) {
         if (number & (1ULL << i)) {
             positions.push_back(i);
         }
@@ -124,9 +147,9 @@ inline std::vector<unsigned int> PieceBitBoards::getSetBitPositions(uint64_t num
     return positions;
 }
 
-inline unsigned int PieceBitBoards::countSetBits(uint64_t number)
+inline uint16_t PieceBitBoards::countSetBits(uint64_t number)
 {
-    unsigned int count = 0;
+    uint16_t count = 0;
     while (number) {
         number &= (number - 1);
         count++;

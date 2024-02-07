@@ -30,29 +30,51 @@ PieceBitBoards::PieceBitBoards(const std::string& fen)
 {
     auto tokens = splitString(fen, ' ');
 
-    if (tokens.size() == 6) {
-        if (parsePosition(tokens[0]) && parseActiveColor(tokens[1]) &&
-            parseCastlingRights(tokens[2]) && parseEnPassant(tokens[3])) {
+    if (tokens.size() != 6 || !parsePosition(tokens[0]) || !parseActiveColor(tokens[1]) ||
+        !parseCastlingRights(tokens[2]) || !parseEnPassant(tokens[3])) {
 
-            zobristKey = ZobristHash::calculateZobristKey(*this);
-            return;
-        }
+        CHESS_LOG_ERROR("Fen string must have 6 parts separated by spaces.");
+
+        // Default starting position.
+        whitePawns = 0xFF000000000000ULL;
+        whiteBishops = 0x2400000000000000ULL;
+        whiteKnights = 0x4200000000000000ULL;
+        whiteRooks = 0x8100000000000000ULL;
+        whiteQueens = 0x800000000000000ULL;
+        whiteKing = 0x1000000000000000ULL;
+        blackPawns = 0xff00ULL;
+        blackBishops = 0x24ULL;
+        blackKnights = 0x42ULL;
+        blackRooks = 0x81ULL;
+        blackQueens = 0x8ULL;
+        blackKing = 0x10ULL;
     }
-    CHESS_LOG_ERROR("Fen string must have 6 parts separated by spaces.");
 
-    // Default starting position.
-    whitePawns = 0xFF000000000000ULL;
-    whiteBishops = 0x2400000000000000ULL;
-    whiteKnights = 0x4200000000000000ULL;
-    whiteRooks = 0x8100000000000000ULL;
-    whiteQueens = 0x800000000000000ULL;
-    whiteKing = 0x1000000000000000ULL;
-    blackPawns = 0xff00ULL;
-    blackBishops = 0x24ULL;
-    blackKnights = 0x42ULL;
-    blackRooks = 0x81ULL;
-    blackQueens = 0x8ULL;
-    blackKing = 0x10ULL;
+    whitePawnPositions = PieceBitBoards::getSetBitPositions(whitePawns);
+    whiteBishopPositions = PieceBitBoards::getSetBitPositions(whiteBishops);
+    whiteKnightPositions = PieceBitBoards::getSetBitPositions(whiteKnights);
+    whiteRookPositions = PieceBitBoards::getSetBitPositions(whiteRooks);
+    whiteQueenPositions = PieceBitBoards::getSetBitPositions(whiteQueens);
+
+    whiteKingPositions = PieceBitBoards::getSetBitPositions(whiteKing);
+    if (whiteKingPositions.size() != 1) {
+        CHESS_LOG_ERROR("White king positions are not size 1.");
+        if (whiteKingPositions.empty())
+            whiteKingPositions = {60};
+    }
+
+    blackPawnPositions = PieceBitBoards::getSetBitPositions(blackPawns);
+    blackBishopPositions = PieceBitBoards::getSetBitPositions(blackBishops);
+    blackKnightPositions = PieceBitBoards::getSetBitPositions(blackKnights);
+    blackRookPositions = PieceBitBoards::getSetBitPositions(blackRooks);
+    blackQueenPositions = PieceBitBoards::getSetBitPositions(blackQueens);
+
+    blackKingPositions = PieceBitBoards::getSetBitPositions(blackKing);
+    if (blackKingPositions.size() != 1) {
+        CHESS_LOG_ERROR("Black king positions are not size 1.");
+        if (whiteKingPositions.empty())
+            whiteKingPositions = {4};
+    }
 
     zobristKey = ZobristHash::calculateZobristKey(*this);
 }
@@ -91,40 +113,52 @@ bool PieceBitBoards::parseRow(const std::string& row, uint8_t rowIndex)
         else {
             switch (ch) {
             case 'P':
-                PieceBitBoards::setBit(whitePawns, rowIndex * 8 + columnIndex);
+                PieceBitBoards::setBit(whitePawns,
+                                       static_cast<uint16_t>(rowIndex * 8 + columnIndex));
                 break;
             case 'N':
-                PieceBitBoards::setBit(whiteKnights, rowIndex * 8 + columnIndex);
+                PieceBitBoards::setBit(whiteKnights,
+                                       static_cast<uint16_t>(rowIndex * 8 + columnIndex));
                 break;
             case 'B':
-                PieceBitBoards::setBit(whiteBishops, rowIndex * 8 + columnIndex);
+                PieceBitBoards::setBit(whiteBishops,
+                                       static_cast<uint16_t>(rowIndex * 8 + columnIndex));
                 break;
             case 'R':
-                PieceBitBoards::setBit(whiteRooks, rowIndex * 8 + columnIndex);
+                PieceBitBoards::setBit(whiteRooks,
+                                       static_cast<uint16_t>(rowIndex * 8 + columnIndex));
                 break;
             case 'Q':
-                PieceBitBoards::setBit(whiteQueens, rowIndex * 8 + columnIndex);
+                PieceBitBoards::setBit(whiteQueens,
+                                       static_cast<uint16_t>(rowIndex * 8 + columnIndex));
                 break;
             case 'K':
-                PieceBitBoards::setBit(whiteKing, rowIndex * 8 + columnIndex);
+                PieceBitBoards::setBit(whiteKing,
+                                       static_cast<uint16_t>(rowIndex * 8 + columnIndex));
                 break;
             case 'p':
-                PieceBitBoards::setBit(blackPawns, rowIndex * 8 + columnIndex);
+                PieceBitBoards::setBit(blackPawns,
+                                       static_cast<uint16_t>(rowIndex * 8 + columnIndex));
                 break;
             case 'n':
-                PieceBitBoards::setBit(blackKnights, rowIndex * 8 + columnIndex);
+                PieceBitBoards::setBit(blackKnights,
+                                       static_cast<uint16_t>(rowIndex * 8 + columnIndex));
                 break;
             case 'b':
-                PieceBitBoards::setBit(blackBishops, rowIndex * 8 + columnIndex);
+                PieceBitBoards::setBit(blackBishops,
+                                       static_cast<uint16_t>(rowIndex * 8 + columnIndex));
                 break;
             case 'r':
-                PieceBitBoards::setBit(blackRooks, rowIndex * 8 + columnIndex);
+                PieceBitBoards::setBit(blackRooks,
+                                       static_cast<uint16_t>(rowIndex * 8 + columnIndex));
                 break;
             case 'q':
-                PieceBitBoards::setBit(blackQueens, rowIndex * 8 + columnIndex);
+                PieceBitBoards::setBit(blackQueens,
+                                       static_cast<uint16_t>(rowIndex * 8 + columnIndex));
                 break;
             case 'k':
-                PieceBitBoards::setBit(blackKing, rowIndex * 8 + columnIndex);
+                PieceBitBoards::setBit(blackKing,
+                                       static_cast<uint16_t>(rowIndex * 8 + columnIndex));
                 break;
             default:
                 CHESS_LOG_ERROR("Fen piece placement character is illegal.");
@@ -212,9 +246,10 @@ std::string PieceBitBoards::getBitBoardString(const uint64_t& bitBoard)
 {
     std::string representation;
 
-    for (unsigned int i = 0; i < 8; ++i) {
-        for (unsigned int j = 0; j < 8; ++j) {
-            representation.append(std::to_string(getBit(bitBoard, i * 8 + j)));
+    for (uint16_t i = 0; i < 8; ++i) {
+        for (uint16_t j = 0; j < 8; ++j) {
+            representation.append(
+                std::to_string(getBit(bitBoard, static_cast<uint16_t>(i * 8 + j))));
         }
         representation.append("\n");
     }
@@ -285,6 +320,30 @@ PieceType PieceBitBoards::getPieceTypeWithSetBitAtPosition(uint16_t position) co
     return PieceType(PieceColor::White, PieceFigure::Empty);
 }
 
+namespace
+{
+
+void erasePosition(std::vector<uint16_t>& positions, uint16_t position)
+{
+    positions.erase(
+        std::remove_if(positions.begin(), positions.end(),
+                       [&](const uint16_t element) -> bool { return element == position; }),
+        positions.end());
+}
+
+void swapPosition(std::vector<uint16_t>& positions, uint16_t oldPosition, uint16_t newPosition)
+{
+    auto it = std::find(positions.begin(), positions.end(), oldPosition);
+
+    if (it != positions.end()) {
+        positions[std::distance(positions.begin(), it)] = newPosition;
+    }
+    else
+        CHESS_LOG_ERROR("Swapping position which doesn't exist.");
+}
+
+} // namespace
+
 void PieceBitBoards::applyMove(Move move)
 {
     auto [figureBoard, figure] = getBoardWithSetBitAtPosition(move.origin, currentMoveColor);
@@ -317,6 +376,11 @@ void PieceBitBoards::applyMove(Move move)
     PieceBitBoards::setBit(*figureBoard, move.destination);
     PieceBitBoards::clearBit(*figureBoard, move.origin);
 
+    auto& movingPiecePositions = getPiecePositions(PieceType(currentMoveColor, figure));
+    swapPosition(movingPiecePositions, move.origin, move.destination);
+    if (typeChanged.getPieceFigure() != PieceFigure::Empty)
+        erasePosition(getPiecePositions(typeChanged), move.destination);
+
     // Update zobrist key
     auto pieceIndex = PieceType(currentMoveColor, figure).getPieceIndex();
     zobristKey ^= ZobristHash::getPieces()[move.origin][pieceIndex];
@@ -325,6 +389,17 @@ void PieceBitBoards::applyMove(Move move)
     if (typeChanged.getPieceFigure() != PieceFigure::Empty)
         zobristKey ^= ZobristHash::getPieces()[move.destination][typeChanged.getPieceIndex()];
 
+    handleCastling(figure, move);
+    handleEnPassant(move);
+    handlePromotion(move);
+
+    currentMoveColor = PieceType::getOppositeColor(currentMoveColor);
+    zobristKey ^= ZobristHash::getSideToMove();
+    halfMoveCount++;
+}
+
+void PieceBitBoards::handleCastling(PieceFigure figure, Move move)
+{
     // If king moves, castling privilege is lost.
     if (figure == PieceFigure::King) {
         if (currentMoveColor == PieceColor::White) {
@@ -366,22 +441,6 @@ void PieceBitBoards::applyMove(Move move)
         blackQueenSideCastle = false;
     }
 
-    // En passant
-    if (move.specialMoveFlag == 2) {
-        if (currentMoveColor == PieceColor::White) {
-            PieceBitBoards::clearBit(blackPawns, move.destination + 8);
-            zobristKey ^= ZobristHash::getPieces()[move.destination + 8]
-                                                  [PieceType(PieceColor::Black, PieceFigure::Pawn)
-                                                       .getPieceIndex()];
-        }
-        else {
-            PieceBitBoards::clearBit(whitePawns, move.destination - 8);
-            zobristKey ^= ZobristHash::getPieces()[move.destination - 8]
-                                                  [PieceType(PieceColor::White, PieceFigure::Pawn)
-                                                       .getPieceIndex()];
-        }
-    }
-
     // Castling. Castling flags are already set to false with checks above (checked with: if king
     // moved).
     if (move.specialMoveFlag == 3) {
@@ -389,6 +448,8 @@ void PieceBitBoards::applyMove(Move move)
             if (move.destination == 62) {
                 PieceBitBoards::setBit(whiteRooks, 61);
                 PieceBitBoards::clearBit(whiteRooks, 63);
+                swapPosition(whiteRookPositions, 63, 61);
+
                 zobristKey ^=
                     ZobristHash::getPieces()[61][PieceType(PieceColor::White, PieceFigure::Rook)
                                                      .getPieceIndex()];
@@ -399,6 +460,8 @@ void PieceBitBoards::applyMove(Move move)
             else if (move.destination == 58) {
                 PieceBitBoards::setBit(whiteRooks, 59);
                 PieceBitBoards::clearBit(whiteRooks, 56);
+                swapPosition(whiteRookPositions, 56, 59);
+
                 zobristKey ^=
                     ZobristHash::getPieces()[59][PieceType(PieceColor::White, PieceFigure::Rook)
                                                      .getPieceIndex()];
@@ -413,6 +476,8 @@ void PieceBitBoards::applyMove(Move move)
             if (move.destination == 6) {
                 PieceBitBoards::setBit(blackRooks, 5);
                 PieceBitBoards::clearBit(blackRooks, 7);
+                swapPosition(blackRookPositions, 7, 5);
+
                 zobristKey ^=
                     ZobristHash::getPieces()[5][PieceType(PieceColor::Black, PieceFigure::Rook)
                                                     .getPieceIndex()];
@@ -423,6 +488,8 @@ void PieceBitBoards::applyMove(Move move)
             else if (move.destination == 2) {
                 PieceBitBoards::setBit(blackRooks, 3);
                 PieceBitBoards::clearBit(blackRooks, 0);
+                swapPosition(blackRookPositions, 0, 3);
+
                 zobristKey ^=
                     ZobristHash::getPieces()[3][PieceType(PieceColor::Black, PieceFigure::Rook)
                                                     .getPieceIndex()];
@@ -434,13 +501,38 @@ void PieceBitBoards::applyMove(Move move)
                 CHESS_LOG_ERROR("Castling king destination is wrong.");
         }
     }
+}
 
-    // Promotion
+void PieceBitBoards::handleEnPassant(Move move)
+{
+    if (move.specialMoveFlag == 2) {
+        if (currentMoveColor == PieceColor::White) {
+            PieceBitBoards::clearBit(blackPawns, move.destination + 8);
+            erasePosition(blackPawnPositions, move.destination + 8);
+            zobristKey ^= ZobristHash::getPieces()[move.destination + 8]
+                                                  [PieceType(PieceColor::Black, PieceFigure::Pawn)
+                                                       .getPieceIndex()];
+        }
+        else {
+            PieceBitBoards::clearBit(whitePawns, move.destination - 8);
+            erasePosition(whitePawnPositions, move.destination - 8);
+            zobristKey ^= ZobristHash::getPieces()[move.destination - 8]
+                                                  [PieceType(PieceColor::White, PieceFigure::Pawn)
+                                                       .getPieceIndex()];
+        }
+    }
+}
+
+void PieceBitBoards::handlePromotion(Move move)
+{
     if (move.specialMoveFlag == 1) {
         if (currentMoveColor == PieceColor::White) {
             if (move.promotion == 0) {
                 PieceBitBoards::setBit(whiteKnights, move.destination);
                 PieceBitBoards::clearBit(whitePawns, move.destination);
+                erasePosition(whitePawnPositions, move.destination);
+                whiteKnightPositions.push_back(move.destination);
+
                 zobristKey ^=
                     ZobristHash::getPieces()[move.destination]
                                             [PieceType(PieceColor::White, PieceFigure::Knight)
@@ -453,6 +545,9 @@ void PieceBitBoards::applyMove(Move move)
             else if (move.promotion == 1) {
                 PieceBitBoards::setBit(whiteBishops, move.destination);
                 PieceBitBoards::clearBit(whitePawns, move.destination);
+                erasePosition(whitePawnPositions, move.destination);
+                whiteBishopPositions.push_back(move.destination);
+
                 zobristKey ^=
                     ZobristHash::getPieces()[move.destination]
                                             [PieceType(PieceColor::White, PieceFigure::Bishop)
@@ -465,6 +560,9 @@ void PieceBitBoards::applyMove(Move move)
             else if (move.promotion == 2) {
                 PieceBitBoards::setBit(whiteRooks, move.destination);
                 PieceBitBoards::clearBit(whitePawns, move.destination);
+                erasePosition(whitePawnPositions, move.destination);
+                whiteRookPositions.push_back(move.destination);
+
                 zobristKey ^=
                     ZobristHash::getPieces()[move.destination]
                                             [PieceType(PieceColor::White, PieceFigure::Rook)
@@ -477,6 +575,9 @@ void PieceBitBoards::applyMove(Move move)
             else if (move.promotion == 3) {
                 PieceBitBoards::setBit(whiteQueens, move.destination);
                 PieceBitBoards::clearBit(whitePawns, move.destination);
+                erasePosition(whitePawnPositions, move.destination);
+                whiteQueenPositions.push_back(move.destination);
+
                 zobristKey ^=
                     ZobristHash::getPieces()[move.destination]
                                             [PieceType(PieceColor::White, PieceFigure::Queen)
@@ -493,6 +594,9 @@ void PieceBitBoards::applyMove(Move move)
             if (move.promotion == 0) {
                 PieceBitBoards::setBit(blackKnights, move.destination);
                 PieceBitBoards::clearBit(blackPawns, move.destination);
+                erasePosition(blackPawnPositions, move.destination);
+                blackKnightPositions.push_back(move.destination);
+
                 zobristKey ^=
                     ZobristHash::getPieces()[move.destination]
                                             [PieceType(PieceColor::Black, PieceFigure::Knight)
@@ -505,6 +609,9 @@ void PieceBitBoards::applyMove(Move move)
             else if (move.promotion == 1) {
                 PieceBitBoards::setBit(blackBishops, move.destination);
                 PieceBitBoards::clearBit(blackPawns, move.destination);
+                erasePosition(blackPawnPositions, move.destination);
+                blackBishopPositions.push_back(move.destination);
+
                 zobristKey ^=
                     ZobristHash::getPieces()[move.destination]
                                             [PieceType(PieceColor::Black, PieceFigure::Bishop)
@@ -517,6 +624,9 @@ void PieceBitBoards::applyMove(Move move)
             else if (move.promotion == 2) {
                 PieceBitBoards::setBit(blackRooks, move.destination);
                 PieceBitBoards::clearBit(blackPawns, move.destination);
+                erasePosition(blackPawnPositions, move.destination);
+                blackRookPositions.push_back(move.destination);
+
                 zobristKey ^=
                     ZobristHash::getPieces()[move.destination]
                                             [PieceType(PieceColor::Black, PieceFigure::Rook)
@@ -529,6 +639,9 @@ void PieceBitBoards::applyMove(Move move)
             else if (move.promotion == 3) {
                 PieceBitBoards::setBit(blackQueens, move.destination);
                 PieceBitBoards::clearBit(blackPawns, move.destination);
+                erasePosition(blackPawnPositions, move.destination);
+                blackQueenPositions.push_back(move.destination);
+
                 zobristKey ^=
                     ZobristHash::getPieces()[move.destination]
                                             [PieceType(PieceColor::Black, PieceFigure::Queen)
@@ -542,9 +655,6 @@ void PieceBitBoards::applyMove(Move move)
                 CHESS_LOG_ERROR("Promotion type is invalid.");
         }
     }
-    currentMoveColor = PieceType::getOppositeColor(currentMoveColor);
-    zobristKey ^= ZobristHash::getSideToMove();
-    halfMoveCount++;
 }
 
 uint64_t PieceBitBoards::getPieceBitBoard(const PieceType& type) const
@@ -578,6 +688,48 @@ uint64_t PieceBitBoards::getPieceBitBoard(const PieceType& type) const
             return blackKing;
     }
     return 0;
+}
+
+std::vector<uint16_t>& PieceBitBoards::getPiecePositions(const PieceType& type)
+{
+    if (type.getPieceColor() == PieceColor::White) {
+        switch (type.getPieceFigure()) {
+        case PieceFigure::Pawn:
+            return whitePawnPositions;
+        case PieceFigure::Bishop:
+            return whiteBishopPositions;
+        case PieceFigure::Rook:
+            return whiteRookPositions;
+        case PieceFigure::Knight:
+            return whiteKnightPositions;
+        case PieceFigure::Queen:
+            return whiteQueenPositions;
+        case PieceFigure::King:
+            return whiteKingPositions;
+        default:
+            break;
+        }
+    }
+    else {
+        switch (type.getPieceFigure()) {
+        case PieceFigure::Pawn:
+            return blackPawnPositions;
+        case PieceFigure::Bishop:
+            return blackBishopPositions;
+        case PieceFigure::Rook:
+            return blackRookPositions;
+        case PieceFigure::Knight:
+            return blackKnightPositions;
+        case PieceFigure::Queen:
+            return blackQueenPositions;
+        case PieceFigure::King:
+            return blackKingPositions;
+        default:
+            break;
+        }
+    }
+    // We have to throw as we have no other valid reference to return.
+    throw std::invalid_argument("Unhandled piece figure in get piece positions.");
 }
 
 } // namespace chessAi

@@ -21,12 +21,12 @@ public:
      */
     const sf::Sprite& getBoardSprite() const;
 
-    void resize(unsigned int newBoardSize);
+    void resize(float newBoardSize);
 
     void setCenterPosition(const sf::Vector2u& windowSize);
 
 private:
-    unsigned int m_boardSize;
+    float m_boardSize;
     sf::Sprite m_boardSprite;
     sf::RenderTexture m_boardTexture;
 };

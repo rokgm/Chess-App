@@ -30,9 +30,9 @@ void generateBoardFields(sf::RenderTexture& board, float fieldSize)
 
 } // namespace
 
-Board::Board(unsigned int boardSize) : m_boardSize(boardSize)
+Board::Board(unsigned int boardSize) : m_boardSize(static_cast<float>(boardSize))
 {
-    if (!m_boardTexture.create(m_boardSize, m_boardSize)) {
+    if (!m_boardTexture.create(boardSize, boardSize)) {
         throw std::runtime_error("Board texture could not be created.");
     }
     m_boardTexture.clear();
@@ -48,11 +48,10 @@ const sf::Sprite& Board::getBoardSprite() const
     return m_boardSprite;
 }
 
-void Board::resize(unsigned int newBoardSize)
+void Board::resize(float newBoardSize)
 {
-    m_boardSprite.setScale(static_cast<float>(newBoardSize) / m_boardSprite.getLocalBounds().width,
-                           static_cast<float>(newBoardSize) /
-                               m_boardSprite.getLocalBounds().height);
+    m_boardSprite.setScale(newBoardSize / m_boardSprite.getLocalBounds().width,
+                           newBoardSize / m_boardSprite.getLocalBounds().height);
     m_boardSize = newBoardSize;
 }
 

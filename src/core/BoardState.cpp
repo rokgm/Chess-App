@@ -15,7 +15,7 @@ const PieceBitBoards& BoardState::getBitBoards() const
 PieceType BoardState::getPiece(unsigned int position) const
 {
     for (const auto& [pieceType, bitBoard] : m_bitBoards.getTypeToPieceBitBoards()) {
-        if (PieceBitBoards::getBit(*bitBoard, position) == 1) {
+        if (PieceBitBoards::getBit(*bitBoard, static_cast<uint16_t>(position)) == 1) {
             return pieceType;
         }
     }
@@ -25,17 +25,17 @@ PieceType BoardState::getPiece(unsigned int position) const
 namespace
 {
 
-template <PieceColor TColor, PieceFigure TFigure>
-bool updateIfLegalMove(PieceBitBoards& bitBoards, Move move)
+template <PieceColor TColor>
+std::optional<Move> updateIfLegalMove(PieceBitBoards& bitBoards, Move move, PieceFigure figure)
 {
     // isLegalMove returns move with special flags set.
-    auto legalMove = MoveGenerator<TColor, TFigure>::isLegalMove(bitBoards, move);
+    auto legalMove = MoveGenerator<TColor>::isLegalMove(bitBoards, move, figure);
     if (!legalMove.first) {
         CHESS_LOG_TRACE("Move is illegal.");
-        return false;
+        return std::nullopt;
     }
     bitBoards.applyMove(legalMove.second);
-    return true;
+    return legalMove.second;
 }
 
 } // namespace
@@ -58,81 +58,22 @@ bool updateIfLegalMove(PieceBitBoards& bitBoards, Move move)
         return EndOfGameType::None;
     }
 
-    // Move that is constructed here does not have special flags set.
+    // Move here does not have special flags set.
     // Use isLegal move to get a returned move with special flags set for en passant, castling...
+    std::optional<Move> appliedMove;
     switch (movingPiece.getPieceColor()) {
     case PieceColor::White:
-        switch (movingPiece.getPieceFigure()) {
-        case PieceFigure::Pawn:
-            if (!updateIfLegalMove<PieceColor::White, PieceFigure::Pawn>(m_bitBoards, move)) {
-                return EndOfGameType::None;
-            }
-            break;
-        case PieceFigure::Bishop:
-            if (!updateIfLegalMove<PieceColor::White, PieceFigure::Bishop>(m_bitBoards, move)) {
-                return EndOfGameType::None;
-            }
-            break;
-        case PieceFigure::Rook:
-            if (!updateIfLegalMove<PieceColor::White, PieceFigure::Rook>(m_bitBoards, move)) {
-                return EndOfGameType::None;
-            }
-            break;
-        case PieceFigure::Knight:
-            if (!updateIfLegalMove<PieceColor::White, PieceFigure::Knight>(m_bitBoards, move)) {
-                return EndOfGameType::None;
-            }
-            break;
-        case PieceFigure::King:
-            if (!updateIfLegalMove<PieceColor::White, PieceFigure::King>(m_bitBoards, move)) {
-                return EndOfGameType::None;
-            }
-            break;
-        case PieceFigure::Queen:
-            if (!updateIfLegalMove<PieceColor::White, PieceFigure::Queen>(m_bitBoards, move)) {
-                return EndOfGameType::None;
-            }
-            break;
-        default:
-            CHESS_LOG_ERROR("Unhandled piece figure.");
-            break;
+        appliedMove =
+            updateIfLegalMove<PieceColor::White>(m_bitBoards, move, movingPiece.getPieceFigure());
+        if (!appliedMove.has_value()) {
+            return EndOfGameType::None;
         }
         break;
     case PieceColor::Black:
-        switch (movingPiece.getPieceFigure()) {
-        case PieceFigure::Pawn:
-            if (!updateIfLegalMove<PieceColor::Black, PieceFigure::Pawn>(m_bitBoards, move)) {
-                return EndOfGameType::None;
-            }
-            break;
-        case PieceFigure::Bishop:
-            if (!updateIfLegalMove<PieceColor::Black, PieceFigure::Bishop>(m_bitBoards, move)) {
-                return EndOfGameType::None;
-            }
-            break;
-        case PieceFigure::Rook:
-            if (!updateIfLegalMove<PieceColor::Black, PieceFigure::Rook>(m_bitBoards, move)) {
-                return EndOfGameType::None;
-            }
-            break;
-        case PieceFigure::Knight:
-            if (!updateIfLegalMove<PieceColor::Black, PieceFigure::Knight>(m_bitBoards, move)) {
-                return EndOfGameType::None;
-            }
-            break;
-        case PieceFigure::King:
-            if (!updateIfLegalMove<PieceColor::Black, PieceFigure::King>(m_bitBoards, move)) {
-                return EndOfGameType::None;
-            }
-            break;
-        case PieceFigure::Queen:
-            if (!updateIfLegalMove<PieceColor::Black, PieceFigure::Queen>(m_bitBoards, move)) {
-                return EndOfGameType::None;
-            }
-            break;
-        default:
-            CHESS_LOG_ERROR("Unhandled piece figure.");
-            break;
+        appliedMove =
+            updateIfLegalMove<PieceColor::Black>(m_bitBoards, move, movingPiece.getPieceFigure());
+        if (!appliedMove.has_value()) {
+            return EndOfGameType::None;
         }
         break;
     default:
@@ -140,7 +81,7 @@ bool updateIfLegalMove(PieceBitBoards& bitBoards, Move move)
         break;
     }
     m_bitBoardsHistory.push_back(m_bitBoards);
-    m_movesHistory.push_back(std::move(move));
+    m_movesHistory.push_back(std::move(appliedMove.value()));
 
     return EndOfGameChecker::checkBoardState(m_bitBoards);
 }
@@ -164,6 +105,16 @@ std::optional<Move> BoardState::getLastMove() const
     if (m_movesHistory.empty())
         return std::nullopt;
     return m_movesHistory.back();
+}
+
+const std::vector<Move>& BoardState::getMovesHistory() const
+{
+    return m_movesHistory;
+}
+
+const std::vector<PieceBitBoards>& BoardState::getBitBoardsHistory() const
+{
+    return m_bitBoardsHistory;
 }
 
 BoardState::BoardState(const std::string& fenString)
@@ -190,6 +141,15 @@ BoardState::BoardState(const std::string& fenString)
     CHESS_LOG_TRACE("blackRooks: \n{}", PieceBitBoards::getBitBoardString(m_bitBoards.blackRooks));
     CHESS_LOG_TRACE("blackQueen: \n{}", PieceBitBoards::getBitBoardString(m_bitBoards.blackQueens));
     CHESS_LOG_TRACE("blackKing: \n{}", PieceBitBoards::getBitBoardString(m_bitBoards.blackKing));
+}
+
+std::vector<uint64_t> BoardState::getZobristKeyHistory() const
+{
+    std::vector<uint64_t> history;
+    for (const auto& board : m_bitBoardsHistory) {
+        history.push_back(board.zobristKey);
+    }
+    return history;
 }
 
 } // namespace chessAi

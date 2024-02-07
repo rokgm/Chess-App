@@ -76,7 +76,7 @@ std::vector<std::string> splitString(const std::string& input, char delimiter)
 
 uint64_t perft(const PieceBitBoards boards, int depth)
 {
-    auto moves = MoveGeneratorWrapper::generateLegalMoves(boards);
+    auto moves = MoveGeneratorWrapper::generateLegalMoves<MoveType::Normal>(boards);
     uint64_t nodes = 0;
     if (depth == 1)
         return moves.size();
@@ -93,7 +93,7 @@ uint64_t perft(const PieceBitBoards boards, int depth)
 std::map<std::string, uint64_t> perftDivided(const PieceBitBoards boards, int depth)
 {
     std::map<std::string, uint64_t> dividedMap;
-    for (auto move : MoveGeneratorWrapper::generateLegalMoves(boards)) {
+    for (auto move : MoveGeneratorWrapper::generateLegalMoves<MoveType::Normal>(boards)) {
         dividedMap.insert({convertMoveToString(move), 1});
     }
 
@@ -180,7 +180,6 @@ TEST(Perft, TestManyPositions)
 TEST(Perft, TestThatFailedOnDepth5_190millionMoves)
 {
     PieceBitBoards board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
-    // auto divided = perftDivided<PieceColor::White>(board, 5);
     board.applyMove(Move(28, 18, 0, 0));
 
     auto divided = perftDivided(board, 4);
@@ -203,6 +202,29 @@ TEST(Perft, TestThatFailedOnDepth5_190millionMoves)
                   << fieldNumberToBoardNotation(convertStringToMove(move).destination) << ": "
                   << count << '\n';
     }
+}
+
+TEST(Perft, Captures)
+{
+    PieceBitBoards board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
+    auto moves = MoveGeneratorWrapper::generateLegalMoves<MoveType::Capture>(board);
+    EXPECT_EQ(moves.size(), 8);
+
+    PieceBitBoards board4("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R b KQkq - 0 1");
+    auto moves4 = MoveGeneratorWrapper::generateLegalMoves<MoveType::Capture>(board4);
+    EXPECT_EQ(moves4.size(), 7);
+
+    PieceBitBoards board1("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1");
+    auto moves1 = MoveGeneratorWrapper::generateLegalMoves<MoveType::Capture>(board1);
+    EXPECT_EQ(moves1.size(), 1);
+
+    PieceBitBoards board2("r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1");
+    auto moves2 = MoveGeneratorWrapper::generateLegalMoves<MoveType::Capture>(board2);
+    EXPECT_EQ(moves2.size(), 0);
+
+    PieceBitBoards board3("r2q1rk1/pP1p2pp/Q4n2/bbp1p3/Np6/1B3NBn/pPPP1PPP/R3K2R b KQ - 0 1");
+    auto moves3 = MoveGeneratorWrapper::generateLegalMoves<MoveType::Capture>(board3);
+    EXPECT_EQ(moves3.size(), 0);
 }
 
 } // namespace chessAi

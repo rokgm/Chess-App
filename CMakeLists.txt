@@ -9,15 +9,6 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Set warning level and treat warning as errors.
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    add_compile_options(-Werror -Wall -Wextra -Wpedantic -Wconversion)
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    add_compile_options(/permissive /W4 /WX)
-else()
-    message(FATAL_ERROR "Compiler not supported for this project.")
-endif()
-
 # Install SFML's Linux Dependencies
 if(UNIX AND NOT APPLE)
     execute_process (
@@ -35,7 +26,7 @@ FetchContent_Declare(SFML
 )
 FetchContent_Declare(spdlog
     GIT_REPOSITORY https://github.com/gabime/spdlog.git
-    GIT_TAG v1.12.0
+    GIT_TAG v1.13.0
 )
 FetchContent_Declare(GTest
     GIT_REPOSITORY https://github.com/google/googletest
@@ -63,7 +54,17 @@ target_compile_definitions(${PROJECT_NAME}
     PRIVATE
     $<$<CONFIG:Debug>:DEBUG>
     $<$<CONFIG:Release>:RELEASE>
+    $<$<CONFIG:RelWithDebInfo>:DEBUG>
 )
+
+# Set warning level and treat warnings as errors.
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    target_compile_options(${PROJECT_NAME} PRIVATE -Werror -Wall -Wextra -Wpedantic -Wconversion)
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    target_compile_options(${PROJECT_NAME} PRIVATE /permissive /W4 /WX)
+else()
+    message(FATAL_ERROR "Compiler not supported for this project.")
+endif()
 
 target_precompile_headers(${PROJECT_NAME}
     PUBLIC
@@ -82,6 +83,7 @@ target_precompile_headers(${PROJECT_NAME}
 # Copy chess pieces images to binary dir.
 file(COPY pieces_images DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 file(COPY fonts DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+file(COPY book DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 
 enable_testing()
 include(CTest)

@@ -1,26 +1,28 @@
 # Chess AI
 
-Chess app written as a bonus project for subject Advanced Programming. GUI was implemented using SFML library.
+Chess app written as a bonus project for subject Advanced Programming at TUM. GUI was implemented using SFML library.
 
 ## Engine Search:
-- No opening books or endgame tablebases are used.
 - Bit board approach.
-- NEGAMAX (minimax variant) with Alpha-Beta pruning
-- Iterative deepening.
-- Transposition table (Zobrist hashing).
-- Move ordering.
+- NEGAMAX (minimax variant) with Alpha-Beta pruning.
+- Iterative Deepening.
+- Transposition Table (Zobrist Hashing).
+- Move Ordering.
 - MVV/LVA.
 - Piece-Square Tables.
 - Mop-up Evaluation.
-##Move Generation Correctness:
+- Quiescence Search.
+- Pawn Shield.
+- Opening Book (currently uses 4469 GM games parsed from PGNs: https://www.pgnmentor.com/files.html#openings).
+#### Move Generation Correctness:
 - **PERFT** tests done on 132 different positions, evaluated to depth 5 (up to 190 million moves per position).
 
 
 ## Requirements
 * **CMake** (minimum required VERSION 3.22) with **Ninja** generator.
 * Compiler:
-    - **MSVC** (Microsoft Visual Studio 2022),
-    - **g++** with C++ 17  support. **WIP** (should work, but was not checked for most recent verison).
+    - **MSVC** (Microsoft Visual Studio 2022 (We use MSVC\14.38.33130 version or older)),
+    - **g++** with C++ 17  support. **WIP** (should work, might not have been checked for last version).
 - SFML, spdlog and SFML's Linux dependencies are automatically installed with this CMake configuration.
 - If SFML's Linux dependencies aren't installed automatically, run `install_SFML_linux_dependencies.sh` manually. If there is a problem with `ft2build.h`, include directory `/usr/include/freetype` or `/usr/include/freetype2`.
 
@@ -46,6 +48,6 @@ to version2.
 - `clang-format` minimum required version `14.0.0`.
 
 ## Literature
-General: https://www.chessprogramming.org/Main_Page
-Overview of the minimax engine: https://www.youtube.com/watch?v=w4FFX_otR-4&list=LL&index=2&t=313s
-Bit Boards: https://ameye.dev/notes/chess-engine/
+- General: https://www.chessprogramming.org/Main_Page
+- Overview of the minimax engine: https://www.youtube.com/watch?v=w4FFX_otR-4&list=LL&index=2&t=313s
+- Bit Boards: https://ameye.dev/notes/chess-engine/
