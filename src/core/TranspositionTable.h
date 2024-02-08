@@ -5,9 +5,6 @@
 namespace chessAi
 {
 
-/**
- * Work in progress.
- */
 class TranspositionTable
 {
 public:
