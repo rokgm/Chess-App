@@ -1,4 +1,4 @@
-# Chess AI
+# Chess Engine and GUI
 
 Chess app written as a bonus project for subject Advanced Programming at TUM. GUI was implemented using SFML library.
 
@@ -21,14 +21,14 @@ Chess app written as a bonus project for subject Advanced Programming at TUM. GU
 ## Requirements
 * **CMake** (minimum required VERSION 3.22) with **Ninja** generator.
 * Compiler:
-    - **MSVC** (Microsoft Visual Studio 2022 (We use MSVC\14.38.33130 version or older)),
-    - **g++** with C++ 17  support. **WIP** (should work, might not have been checked for last version).
+    - **MSVC** (Microsoft Visual Studio 2022 (MSVC 14.38.33130)),
+    - **g++** with C++ 17  support (gcc 11.4.0).
 - SFML, spdlog and SFML's Linux dependencies are automatically installed with this CMake configuration.
 - If SFML's Linux dependencies aren't installed automatically, run `install_SFML_linux_dependencies.sh` manually. If there is a problem with `ft2build.h`, include directory `/usr/include/freetype` or `/usr/include/freetype2`.
 
 ## Build
 - Run CMake Configure `cmake --preset Release` or `Debug`.
-- Build chessAi target `cmake --build ./build/Release --parallel 10 --target chess_ai`.
+- Build chess_ai target `cmake --build ./build/Release --parallel 10 --target chess_ai`.
 - Or just use VS Code CMake extensions.
 
 This applies to all build configurations (Debug, Release).
