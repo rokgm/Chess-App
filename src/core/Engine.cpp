@@ -20,17 +20,20 @@ Engine::Engine(bool useBook, const std::chrono::milliseconds& timeLimit, unsigne
         m_useOpeningBook = OpeningBook::Init();
 }
 
-int Engine::evaluateEndGameType(const PieceBitBoards& bitBoards, int depth)
+int Engine::evaluateEndGameType(const PieceBitBoards& bitBoards, int depth,
+                                unsigned int numCheckExtensions)
 {
     if (bitBoards.currentMoveColor == PieceColor::White) {
-        // Must add depth so we find the shortest mate (mate pruning).
+        // Must add depth so we find the shortest mate (mate pruning), also add check extensions.
         if (MoveGenerator<PieceColor::White>::isKingInCheck(bitBoards))
-            return Evaluate::negativeMateScore + m_currentIterativeDepth - depth;
+            return Evaluate::negativeMateScore + (m_currentIterativeDepth + numCheckExtensions) -
+                   depth;
         return 0;
     }
     else {
         if (MoveGenerator<PieceColor::Black>::isKingInCheck(bitBoards))
-            return Evaluate::negativeMateScore + m_currentIterativeDepth - depth;
+            return Evaluate::negativeMateScore + (m_currentIterativeDepth + numCheckExtensions) -
+                   depth;
         return 0;
     }
 }
@@ -100,7 +103,7 @@ int Engine::negamax(const PieceBitBoards& bitBoards, unsigned int depth, int alp
     std::vector<Move> moves = MoveGeneratorWrapper::generateLegalMoves<MoveType::Normal>(bitBoards);
 
     if (moves.empty())
-        return evaluateEndGameType(bitBoards, depth);
+        return evaluateEndGameType(bitBoards, depth, numCheckExtensions);
 
     int bestEvaluation = Evaluate::negativeInfinity;
     Move bestMove(0, 0, 0, 0);
@@ -199,7 +202,8 @@ std::pair<Move, bool> Engine::iterativeDeepening(const PieceBitBoards& bitBoards
         tempBoards = bitBoards;
     }
 
-    // Important for move ordering in iterative deepening, search previous move first.
+    // Important for move ordering in iterative deepening, search previous move first. Do not store
+    // false evaluation.
     if (m_runSearch && !(bestMove == Move(0, 0, 0, 0))) {
         m_transpositionTable.store(bitBoards.zobristKey, bestEvaluation, depth,
                                    TranspositionTable::TypeOfNode::exact, bestMove);

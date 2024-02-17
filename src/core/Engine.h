@@ -87,7 +87,8 @@ private:
         const std::vector<Move>& moves, const PieceBitBoards& boards,
         bool useTranspositions = true);
 
-    int evaluateEndGameType(const PieceBitBoards& boards, int depth);
+    int evaluateEndGameType(const PieceBitBoards& boards, int depth,
+                            unsigned int numCheckExtensions);
 
     /**
      * Search position until quite and then return evaluation. Depth is the limit of captures
