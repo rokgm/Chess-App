@@ -1,6 +1,7 @@
-# Chess Engine and GUI
+# Chess GUI
 
 Chess app written as a bonus project for subject Advanced Programming at TUM. GUI was implemented using SFML library.
+GUI uses my chess engine from separate repo: https://github.com/rokgm/UCI-Chess-Engine.
 
 ## Engine Search:
 - Bit board approach.

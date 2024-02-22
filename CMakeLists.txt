@@ -28,12 +28,11 @@ FetchContent_Declare(spdlog
     GIT_REPOSITORY https://github.com/gabime/spdlog.git
     GIT_TAG v1.13.0
 )
-FetchContent_Declare(GTest
-    GIT_REPOSITORY https://github.com/google/googletest
-    GIT_TAG v1.14.x
+FetchContent_Declare(core
+    GIT_REPOSITORY https://github.com/rokgm/UCI-Chess-Engine
 )
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(SFML spdlog GTest)
+
+FetchContent_MakeAvailable(SFML spdlog core)
 
 # PROJECT CHESS-AI
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -83,10 +82,5 @@ target_precompile_headers(${PROJECT_NAME}
 # Copy chess pieces images to binary dir.
 file(COPY pieces_images DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 file(COPY fonts DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
-file(COPY book DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
-
-enable_testing()
-include(CTest)
 
 add_subdirectory(src)
-add_subdirectory(test)

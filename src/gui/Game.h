@@ -1,8 +1,9 @@
 #pragma once
 
 #include "Board.h"
-#include "core/BoardState.h"
-#include "core/Engine.h"
+
+#include <core/BoardState.h>
+#include <core/Engine.h>
 
 #include <SFML/Graphics.hpp>
 

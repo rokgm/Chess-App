@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/PieceType.h"
+#include <core/PieceType.h>
 
 #include <SFML/Graphics.hpp>
 

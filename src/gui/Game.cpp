@@ -1,6 +1,7 @@
 #include "Game.h"
-#include "core/EndOfGameChecker.h"
-#include "core/MoveGenerator.h"
+
+#include <core/EndOfGameChecker.h>
+#include <core/MoveGenerator.h>
 
 #include <thread>
 
