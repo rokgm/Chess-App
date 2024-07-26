@@ -1,27 +1,44 @@
 {
-  "version": 2,
-  "configurePresets": [
-    {
-      "name": "Debug",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/${presetName}",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug"
-      }
-    },
-    {
-      "name": "Release",
-      "inherits": "Debug",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release"
-      }
-    },
-    {
-      "name": "RelWithDebInfo",
-      "inherits": "Release",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
-      }
-    }
-  ]
+    "version": 2,
+    "configurePresets": [
+        {
+            "name": "Debug",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+        }
+        },
+        {
+            "name": "Release",
+            "inherits": "Debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+        }
+        },
+        {
+            "name": "RelWithDebInfo",
+            "inherits": "Release",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "Debug",
+            "configurePreset": "Debug",
+            "targets": ["chess_ai"]
+        },
+        {
+            "name": "Release",
+            "inherits": "Debug",
+            "configurePreset": "Release"
+        },
+        {
+            "name": "RelWithDebInfo",
+            "inherits": "Debug",
+            "configurePreset": "RelWithDebInfo"
+        }
+    ]
 }

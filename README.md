@@ -19,7 +19,7 @@ Chess app written as a bonus project for subject Advanced Programming at TUM. GU
 
 
 ## Requirements
-* **CMake** (minimum required VERSION 3.22) with **Ninja** generator.
+* **CMake** (minimum required VERSION 3.22) with **Ninja** generator. (If you don't want to use ninja, don't use presets: explained in build section.)
 * Compiler:
     - **MSVC** (Microsoft Visual Studio 2022 (MSVC 14.38.33130)),
     - **g++** with C++ 17  support (gcc 11.4.0).
@@ -27,9 +27,17 @@ Chess app written as a bonus project for subject Advanced Programming at TUM. GU
 - If SFML's Linux dependencies aren't installed automatically, run `install_SFML_linux_dependencies.sh` manually. If there is a problem with `ft2build.h`, include directory `/usr/include/freetype` or `/usr/include/freetype2`.
 
 ## Build
-- Run CMake Configure `cmake --preset Release` or `Debug`.
-- Build chess_ai target `cmake --build ./build/Release --parallel 10 --target chess_ai`.
-- Or just use VS Code CMake extensions.
+- Run CMake configure: `cmake --preset Release/Debug`.
+- Run build: `cmake --build --preset Release/Debug`. Optionally add `--parallel 10` for parallel build; change number to desired number of jobs.
+- Or just use VS Code CMake extensions. Set so the preset is used.
+
+Using a different generator than **Ninja** (e.g. Visual Studio 2022 and x64):
+- `mkdir build` and `cd build`
+- Run CMake Configure `cmake -G "Visual Studio 17 2022" -A x64 ..`.
+Now open the solution file in Visual Studio and build the project or build via command line:
+- `cmake --build .. --config Debug` For Debug build
+- `cmake --build .. --config Release` For Release build
+- TODO: fix the build for Visual Studio, pieces not copied into correct build folder... Works for some reason. Add how to build without presets for all.
 
 This applies to all build configurations (Debug, Release).
 - Warnings are treated as errors.
@@ -37,7 +45,7 @@ This applies to all build configurations (Debug, Release).
 
 
 ## Developing on Windows
-- Using **VS Code**, open VS Code with `scripts/msvc_env.bat` to setup the correct environment for MSVC or open Code through `Visual Studio Developer Command Prompt`.
+- Using **VS Code**, open VS Code with `scripts/msvc_env.bat` to setup the correct environment for MSVC or open Code through `Visual Studio Developer Command Prompt`. Set up for x64.
 
 ## Contributing
 - Make a branch with name that summaries what will be implemented and then make a merge request
