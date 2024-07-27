@@ -29,7 +29,7 @@ Chess app written as a bonus project for subject Advanced Programming at TUM. GU
 ## Build
 - Run CMake configure: `cmake --preset Release/Debug`.
 - Run build: `cmake --build --preset Release/Debug`. Optionally add `--parallel 10` for parallel build; change number to desired number of jobs.
-- Or use VS Code CMake extensions. Setup so the preset is used.
+- Or additionally use VS Code CMake extensions. Setup so the preset is used.
 
 This applies to all build configurations (Debug, Release).
 - Warnings are treated as errors.
