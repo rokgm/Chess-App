@@ -29,7 +29,7 @@ Chess application developed as a bonus project for Advanced Programming subject 
     - SFML Dependencies: If there is a problem with `ft2build.h`, add directories `/usr/include/freetype` or `/usr/include/freetype2` to $PATH.
 
 ## Build
-#### On windows set up MSVC environment:
+### On windows set up MSVC environment:
 - Open a terminal and run: `call <path to vcvarsall.bat> x64 && cmd`. For example run: `call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" x64 && cmd`.
 
 - Alternatively, this can also be set up through the Visual Studio Developer Command Prompt:
@@ -37,7 +37,7 @@ Chess application developed as a bonus project for Advanced Programming subject 
 
 Verify that the environment is set up by calling `cl` (MSVC compiler).
 
-#### Build with CMake:
+### Build with CMake:
 - Run configure: `cmake --preset Release/Debug`.
 - Run build: `cmake --build --preset Release/Debug --parallel`.
 
