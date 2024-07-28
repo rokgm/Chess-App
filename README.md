@@ -1,6 +1,8 @@
 # Chess Engine and GUI
 
-Chess app written as a bonus project for subject Advanced Programming at TUM. GUI was implemented using SFML library.
+Chess application developed as a bonus project for Advanced Programming subject at TUM. GUI was implemented using SFML library.
+
+![Gameplay](assets/gameplay.gif)
 
 ## Engine Search:
 - Bit board approach.
@@ -15,7 +17,7 @@ Chess app written as a bonus project for subject Advanced Programming at TUM. GU
 - Pawn Shield.
 - Opening Book (currently uses 4469 GM games parsed from PGNs: https://www.pgnmentor.com/files.html#openings).
 #### Move Generation Correctness:
-- **PERFT** tests done on 132 different positions, evaluated to depth 5 (up to 190 million moves per position).
+- **PERFT** tests done on 132 different positions, evaluated to depth 5.
 
 
 ## Requirements
@@ -24,25 +26,26 @@ Chess app written as a bonus project for subject Advanced Programming at TUM. GU
     - **MSVC** (Microsoft Visual Studio 2022 (MSVC 14.38.33130)),
     - **g++** with C++ 17  support (gcc 11.4.0).
 - SFML, spdlog and SFML's Linux dependencies are automatically installed with this CMake configuration.
-- If SFML's Linux dependencies aren't installed automatically, run `install_SFML_linux_dependencies.sh` manually. If there is a problem with `ft2build.h`, include directory `/usr/include/freetype` or `/usr/include/freetype2`.
+    - SFML Dependencies: If there is a problem with `ft2build.h`, add directories `/usr/include/freetype` or `/usr/include/freetype2` to $PATH.
 
 ## Build
-- Run CMake configure: `cmake --preset Release/Debug`.
-- Run build: `cmake --build --preset Release/Debug`. Optionally add `--parallel 10` for parallel build; change number to desired number of jobs.
-- Or additionally use VS Code CMake extensions. Setup so the preset is used.
+#### On windows set up MSVC environment:
+- Open a terminal and run: `call <path to vcvarsall.bat> x64 && cmd`. For example run: `call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" x64 && cmd`.
 
-This applies to all build configurations (Debug, Release).
+- Alternatively, this can also be set up through the Visual Studio Developer Command Prompt:
+    - Open the x64 Native Tools Command Prompt. Ensure the environment is initialized for 'x64'. If not, run `vcvarsall.bat x64`.
+
+Verify that the environment is set up by calling `cl` (MSVC compiler).
+
+#### Build with CMake:
+- Run configure: `cmake --preset Release/Debug`.
+- Run build: `cmake --build --preset Release/Debug --parallel`.
+
+**This applies to all build configurations** (Debug, Release).
 - Warnings are treated as errors.
 - Warning levels are increased (see CMakeLists.txt for compile flags).
 
-
-## Developing on Windows
-- Using **VS Code**, open VS Code with `scripts/msvc_env.bat` to setup the correct environment for MSVC.
-Or compile through `Visual Studio Developer Command Prompt`. Set up for x64.
-
 ## Contributing
-- Make a branch with name that summaries what will be implemented and then make a merge request
-to version2.
 - Use camel case.
 - Use **`.clang-format`** to format code.
 - Set auto format on.
