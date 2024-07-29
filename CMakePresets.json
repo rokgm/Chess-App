@@ -28,7 +28,7 @@
         {
             "name": "Debug",
             "configurePreset": "Debug",
-            "targets": ["chess_ai"]
+            "targets": ["chess_ai", "unit_tests", "performance_tests"]
         },
         {
             "name": "Release",

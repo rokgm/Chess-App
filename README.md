@@ -25,8 +25,6 @@ Chess application developed as a bonus project for Advanced Programming subject 
 * Compiler:
     - **MSVC** (Microsoft Visual Studio 2022 (MSVC 14.38.33130)),
     - **g++** with C++ 17  support (gcc 11.4.0).
-- SFML, spdlog and SFML's Linux dependencies are automatically installed with this CMake configuration.
-    - SFML Dependencies: If there is a problem with `ft2build.h`, add directories `/usr/include/freetype` or `/usr/include/freetype2` to $PATH.
 
 ## Build
 ### On windows set up MSVC environment:
@@ -36,6 +34,22 @@ Chess application developed as a bonus project for Advanced Programming subject 
     - Open the x64 Native Tools Command Prompt. Ensure the environment is initialized for 'x64'. If not, run `vcvarsall.bat x64`.
 
 Verify that the environment is set up by calling `cl` (MSVC compiler).
+
+### On linux install SFML's dependencies:
+```console
+sudo apt-get update
+sudo apt-get install -y \
+    libxrandr-dev \
+    libxcursor-dev \
+    libudev-dev \
+    libfreetype-dev \
+    libopenal-dev \
+    libflac-dev \
+    libvorbis-dev \
+    libgl1-mesa-dev \
+    libegl1-mesa-dev
+```
+If there is a problem with `ft2build.h`, add directories `/usr/include/freetype` or `/usr/include/freetype2` to $PATH.
 
 ### Build with CMake:
 - Run configure: `cmake --preset Release/Debug`.

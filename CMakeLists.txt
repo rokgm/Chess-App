@@ -9,47 +9,6 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Install SFML's Linux Dependencies
-if(UNIX AND NOT APPLE)
-    message(STATUS "Installing SFML's Linux dependencies...")
-
-    execute_process(
-        COMMAND sudo apt-get update
-        RESULT_VARIABLE update_result
-        OUTPUT_VARIABLE update_output
-        ERROR_VARIABLE update_error
-    )
-    if(NOT update_result EQUAL "0")
-        message(FATAL_ERROR "Failed to update package list: ${update_error}")
-    endif()
-
-    # Install required packages
-    set(PACKAGES 
-        libxrandr-dev
-        libxcursor-dev
-        libudev-dev
-        libfreetype-dev
-        libopenal-dev
-        libflac-dev
-        libvorbis-dev
-        libgl1-mesa-dev
-        libegl1-mesa-dev
-    )
-
-    foreach(PACKAGE IN LISTS PACKAGES)
-        execute_process(
-            COMMAND sudo apt-get install -y ${PACKAGE}
-            RESULT_VARIABLE install_result
-            OUTPUT_VARIABLE install_output
-            ERROR_VARIABLE install_error
-        )
-        if(NOT install_result EQUAL "0")
-            message(FATAL_ERROR "Failed to install ${PACKAGE}: ${install_error}")
-        endif()
-    endforeach()
-
-endif()
-
 # Install CHESS-AI Project Dependencies
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
