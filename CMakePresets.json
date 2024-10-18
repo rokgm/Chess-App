@@ -7,14 +7,14 @@
             "binaryDir": "${sourceDir}/build/${presetName}",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug"
-        }
+            }
         },
         {
             "name": "Release",
             "inherits": "Debug",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release"
-        }
+            }
         },
         {
             "name": "RelWithDebInfo",
@@ -28,7 +28,9 @@
         {
             "name": "Debug",
             "configurePreset": "Debug",
-            "targets": ["chess_ai", "unit_tests", "performance_tests"]
+            "targets": [
+                "chess_ai"
+            ]
         },
         {
             "name": "Release",
@@ -39,6 +41,38 @@
             "name": "RelWithDebInfo",
             "inherits": "Debug",
             "configurePreset": "RelWithDebInfo"
+        },
+        {
+            "name": "UnitTestsDebug",
+            "inherits": "Debug",
+            "configurePreset": "Debug",
+            "targets": [
+                "unit_tests"
+            ]
+        },
+        {
+            "name": "UnitTestsRelease",
+            "inherits": "Release",
+            "configurePreset": "Release",
+            "targets": [
+                "unit_tests"
+            ]
+        },
+        {
+            "name": "PerformanceTestsDebug",
+            "inherits": "Debug",
+            "configurePreset": "Debug",
+            "targets": [
+                "performance_tests"
+            ]
+        },
+        {
+            "name": "PerformanceTestsRelease",
+            "inherits": "Release",
+            "configurePreset": "Release",
+            "targets": [
+                "performance_tests"
+            ]
         }
     ]
 }

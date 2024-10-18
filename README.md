@@ -5,8 +5,8 @@ Chess application developed as a bonus project for Advanced Programming subject 
 ![Gameplay](assets/gameplay.gif)
 
 ## Engine Search:
-- Bit board approach.
 - NEGAMAX (minimax variant) with Alpha-Beta pruning.
+- Bit board approach.
 - Iterative Deepening.
 - Transposition Table (Zobrist Hashing).
 - Move Ordering.
@@ -23,22 +23,33 @@ Chess application developed as a bonus project for Advanced Programming subject 
 ## Requirements
 * **CMake** (minimum required VERSION 3.22) with **Ninja** generator.
 * Compiler:
-    - **MSVC** (Microsoft Visual Studio 2022 (MSVC 14.38.33130)),
-    - **g++** with C++ 17  support (gcc 11.4.0).
+    - **MSVC** with C++ 17 (Microsoft Visual Studio 2022 (MSVC 14.38.33130)),
+    - **g++** with C++ 17 (gcc 11.4.0).
+* SFML and spdlog are automatically fetched with this CMake configuration.
 
-## Build
-### On windows set up MSVC environment:
-- Open a terminal and run: `call <path to vcvarsall.bat> x64 && cmd`. For example run: `call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" x64 && cmd`.
+## Build Instructions
 
-- Alternatively, this can also be set up through the Visual Studio Developer Command Prompt:
-    - Open the x64 Native Tools Command Prompt. Ensure the environment is initialized for 'x64'. If not, run `vcvarsall.bat x64`.
+### Setting Up the MSVC Environment for CMD Build (Windows):
+1. Open a terminal and run:
+```console
+call <path to vcvarsall.bat> x64 && cmd
+```
+- For example run: `call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" x64 && cmd`.
 
-Verify that the environment is set up by calling `cl` (MSVC compiler).
+2. Alternatively, set up the environment using the Visual Studio Developer Command Prompt:
+- Open the `x64 Native Tools Command Prompt`.
+- Ensure the environment is initialized for `x64`. If not, run `vcvarsall.bat x64`.
 
-### On linux install SFML's dependencies:
+3. Verify that the environment is set up by calling `cl`. (This checks if the MSVC compiler is available.)
+
+### Building with Visual Studio:
+- Open the CMake project directly with Visual Studio.
+
+### Installing SFML Dependencies on Linux:
+Run the following commands in your terminal:
 ```console
 sudo apt-get update
-sudo apt-get install -y \
+sudo apt-get install \
     libxrandr-dev \
     libxcursor-dev \
     libudev-dev \
@@ -49,15 +60,25 @@ sudo apt-get install -y \
     libgl1-mesa-dev \
     libegl1-mesa-dev
 ```
-If there is a problem with `ft2build.h`, add directories `/usr/include/freetype` or `/usr/include/freetype2` to $PATH.
+- If there is an issue with `ft2build.h`, add the following directories to your `$PATH`:
+    - `/usr/include/freetype`
+    - `/usr/include/freetype2`
 
-### Build with CMake:
-- Run configure: `cmake --preset Release/Debug`.
-- Run build: `cmake --build --preset Release/Debug --parallel`.
+### Building the Project with CMake:
 
-**This applies to all build configurations** (Debug, Release).
+1. Configure the project:
+```console
+cmake --preset <Release/Debug>
+```
+2. Build the project:
+```console
+cmake --build --preset <Release/Debug> --parallel
+```
+
+#### Notes:
+- **These instructions apply to all build configurations** (Debug, Release).
 - Warnings are treated as errors.
-- Warning levels are increased (see CMakeLists.txt for compile flags).
+- Warning levels are increased (check `CMakeLists.txt` for compile flags).
 
 ## Contributing
 - Use camel case.
