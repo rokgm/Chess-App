@@ -80,11 +80,22 @@ cmake --build --preset <Release/Debug> --parallel
 - Warnings are treated as errors.
 - Warning levels are increased (check `CMakeLists.txt` for compile flags).
 
-## Contributing
-- Use camel case.
-- Use **`.clang-format`** to format code.
-- Set auto format on.
-- `clang-format` minimum required version `14.0.0`.
+## How to Run
+1. Navigate to the Build Directory:
+```console
+cd build/<Release/Debug>
+```
+2. Run the Executable:
+    - On Linux:
+    ```console
+    ./chess_ai
+    ```
+    - On Windows:
+    ```console
+    chess_ai.exe
+    ```
+3. Logging
+- The logger file is created in the build directory.
 
 ## Testing
 Run tests with the following command:
@@ -92,6 +103,12 @@ Run tests with the following command:
 cd build/<Release/Debug>
 ctest -R ^<unit_tests/performance_tests>$
 ```
+
+## Contributing
+- Use camel case.
+- Use **`.clang-format`** to format code.
+- Set auto format on.
+- `clang-format` minimum required version `14.0.0`.
 
 ## Literature
 - General: https://www.chessprogramming.org/Main_Page
