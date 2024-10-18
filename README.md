@@ -86,6 +86,13 @@ cmake --build --preset <Release/Debug> --parallel
 - Set auto format on.
 - `clang-format` minimum required version `14.0.0`.
 
+## Testing
+Run tests with the following command:
+```console
+cd build/<Release/Debug>
+ctest -R ^<unit_tests/performance_tests>$
+```
+
 ## Literature
 - General: https://www.chessprogramming.org/Main_Page
 - Overview of the minimax engine: https://www.youtube.com/watch?v=w4FFX_otR-4&list=LL&index=2&t=313s
