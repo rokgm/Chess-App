@@ -381,7 +381,7 @@ void GameMenu::drawFenText()
     }
 }
 
-std::tuple<PieceColor, bool, std::string, Difficulty> GameMenu::runMenu()
+PlayerSelection GameMenu::runMenu()
 {
     while (m_window->isOpen()) {
         handleEvents();

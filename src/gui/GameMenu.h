@@ -16,6 +16,14 @@ enum class Difficulty
     hard
 };
 
+struct PlayerSelection
+{
+    PieceColor color;
+    bool againstComputer;
+    std::string fenString;
+    Difficulty difficulty;
+};
+
 class GameMenu
 {
 public:
@@ -24,7 +32,7 @@ public:
      * @return Selected player color, true if against computer and position fen string (can be
      * empty).
      */
-    std::tuple<PieceColor, bool, std::string, Difficulty> runMenu();
+    PlayerSelection runMenu();
 
 private:
     void handleEvents();

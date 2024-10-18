@@ -1,6 +1,20 @@
 #include "gui/Game.h"
 #include "gui/GameMenu.h"
 
+std::chrono::milliseconds getTimeLimit(chessAi::Difficulty difficulty)
+{
+    switch (difficulty) {
+    case chessAi::Difficulty::easy:
+        return std::chrono::milliseconds(1000);
+    case chessAi::Difficulty::medium:
+        return std::chrono::milliseconds(3000);
+    case chessAi::Difficulty::hard:
+        return std::chrono::milliseconds(6000);
+    default:
+        return std::chrono::milliseconds(1000);
+    }
+}
+
 int main()
 {
     try {
@@ -10,24 +24,8 @@ int main()
         while (window.isOpen()) {
             chessAi::GameMenu menu(&window);
             auto playerSelection = menu.runMenu();
-
-            std::chrono::milliseconds timeLimit(1000);
-            switch (std::get<3>(playerSelection)) {
-            case chessAi::Difficulty::easy:
-                timeLimit = std::chrono::milliseconds(1000);
-                break;
-            case chessAi::Difficulty::medium:
-                timeLimit = std::chrono::milliseconds(3000);
-                break;
-            case chessAi::Difficulty::hard:
-                timeLimit = std::chrono::milliseconds(6000);
-                break;
-            default:
-                break;
-            }
-
-            chessAi::Game game(&window, std::get<0>(playerSelection), std::get<1>(playerSelection),
-                               timeLimit, std::get<2>(playerSelection));
+            chessAi::Game game(&window, playerSelection.color, playerSelection.againstComputer,
+                               getTimeLimit(playerSelection.difficulty), playerSelection.fenString);
             game.runGame();
         }
     }
